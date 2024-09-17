@@ -20,8 +20,8 @@
 MAIN: la s3, ENTIDADES_INFO       # ENDEREÇO DA LISTA CONTENDO AS ENTIDADES
       addi s4, s3, 24             # ENDEREÇO DA LISTA ONDE DEVE SER SALVO O PRÓXIMO ITEM
       
-      la s11, mapa_1
-      mv s9, s11
+      la, s11, mapa_1
+      addi s9, s11, 4
       li s10, 16
       
       li s5, 0 
@@ -53,7 +53,7 @@ SETUP:     addi sp, sp, -4             # Ajusta a pilha para salvar ra
            addi sp, sp, 4              # Ajusta a pilha de volta
 	   
 	   li s1, 0                    # frame de colisão
-	   mv, s9, s11                 # início do mapa
+	   addi s9, s11, 4
 	   li s0, 0                    # Frame de início
     	   
 	   addi sp, sp, -4             # Ajusta a pilha para salvar ra
@@ -732,7 +732,8 @@ ANDANDO_DIR:   addi t1, t1, 15
 
 #-------------------------------------------------------------------------------------------------------
 COLIDE_NORMAL: li t6, 16
-               li t5, 60                 # largura do mapa
+               #li t5, 60
+               lw t5, 0(s11)                # largura do mapa
 
                div t1, t1, t6
                div t2, t2, t6
@@ -741,7 +742,8 @@ COLIDE_NORMAL: li t6, 16
                                       
                add t2, t1, t2            # APï¿½S MULTIPLICAR POR 20 E SOMAR COM A COMPONENTE X, TEMOS EXATAMENTE O BYTE PARA ONDE SAMUS ANDARï¿½
                
-               add t4, s11, t2          # SOMAMOS S11 A T2 PARA SABER QUAL BYTE DO MAPA ï¿½, SE ELE FOR DO TIPO QUE COLIDE (TIJOLO OU METAL) RETORNA 0
+               addi t4, s11, 4
+               add t4, t4, t2          # SOMAMOS S11 A T2 PARA SABER QUAL BYTE DO MAPA ï¿½, SE ELE FOR DO TIPO QUE COLIDE (TIJOLO OU METAL) RETORNA 0
                
                lb t3, 0(t4)
                
@@ -1485,7 +1487,14 @@ NEXT_PIXEL:
     li t3, 20           # Total de colunas
     blt s2, t3, PRINT_MAP
     
-    addi s9, s9, 40
+    #lw t0, 0(s11)
+    #addi t0, t0, -20
+    #add s9, s9, t0
+    
+    lw t0, 0(s11)
+    addi t0, t0, -20
+    add s9, s9, t0
+    
     mv s2, zero
 
     # Próxima linha
@@ -1574,7 +1583,7 @@ fundo_preto: .word 16, 16
 
 #--------------------------------------------------MAPAS------------------------------------------------------------------------
 
-mapa_1: #.word 60, 15
+mapa_2: .word 60,
         .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	      0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
               0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
@@ -1591,7 +1600,7 @@ mapa_1: #.word 60, 15
               0,1,9,9,9,9,9,9,9,1,1,9,9,9,1,0,0,0,0,0,0,0,0,1,9,9,9,9,9,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
               0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
               
-mapa_2: .word 80, 15
+mapa_1: .word 80,
         .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,0,0,
