@@ -53,7 +53,7 @@ SETUP:     addi sp, sp, -4             # Ajusta a pilha para salvar ra
            addi sp, sp, 4              # Ajusta a pilha de volta
 	   
 	   li s1, 0                    # frame de colisão
-	   mv s9, s11                  # início do mapa
+	   mv, s9, s11                 # início do mapa
 	   li s0, 0                    # Frame de início
     	   
 	   addi sp, sp, -4             # Ajusta a pilha para salvar ra
@@ -86,21 +86,21 @@ GAME_LOOP: xori s0, s0, 1
            j SEGUE_LOOP
            
            #-------------------------------------------------------------------------------------------------------
-           
 ANDA_MAPA_DIR:
             addi s4, s3, 24             # REINICIA A LISTA DE ENTIDADES
             
             addi s10, s10, 20
             addi s9, s9, 20
             
-            sh zero, 0(s3)
-            sh zero, 8(s3)              # COLOCA A SAMUS NA POSIÇÃO ZERO EM CHAR_POS, OLD_CHAR_POS E NEXT_CHAR_POS
-            sh zero, 16(s3)
+            li t0, 4
+            sh t0, 0(s3)
+            sh t0, 8(s3)              # COLOCA A SAMUS NA POSIÇÃO ZERO EM CHAR_POS, OLD_CHAR_POS E NEXT_CHAR_POS
+            sh t0, 16(s3)
+            
             j PRINTA_MAPA
-
 ANDA_MAPA_ESQ:
            addi s4, s3, 24              # REINICIA A LISTA DE ENTIDADES
-           
+          
            addi s10, s10, -20
            addi s9, s9, -20
            
@@ -126,31 +126,29 @@ PRINTA_MAPA:
            
            #--------------------------------------------------------------------------------------------------------
 
-SEGUE_LOOP:addi sp, sp, -4            # Ajusta a pilha para salvar ra
-    	   sw ra, 0(sp)               # Salva ra na pilha
+SEGUE_LOOP:addi sp, sp, -4             # Ajusta a pilha para salvar ra
+    	   sw ra, 0(sp)                # Salva ra na pilha
            call IA_ENTIDADES
-           lw ra, 0(sp)               # Restaura ra da pilhad
-           addi sp, sp, 4             # Ajusta a pilha de volta
+           lw ra, 0(sp)                # Restaura ra da pilhad
+           addi sp, sp, 4              # Ajusta a pilha de volta
            
-#DELAY:     li t0, 1000                 # Define o valor do contador (ajuste para o atraso desejado)
+DELAY:     li t0, 1                    # Define o valor do contador (ajuste para o atraso desejado)
   
-#DELAY_LOOP:addi t0, t0, -1             # Decrementa o contador
-#           beq t0, zero, VOLTA_LOOP    # Se o contador não chegou a 0, continua o loop
-#           j DELAY_LOOP                # Retorna quando o contador atingir 0
+DELAY_LOOP:addi t0, t0, -1             # Decrementa o contador
+           beq t0, zero, VOLTA_LOOP    # Se o contador não chegou a 0, continua o loop
+           j DELAY_LOOP                # Retorna quando o contador atingir 0
 
-            
- 	   
 VOLTA_LOOP:li t0, 0xFF200604
  	   sw s0, 0(t0)
  	   
- 	   lh t0, 4(s3)                # SE A VIDA DA SAMUS FOR ZERO, ENCERRA O JOGO
- 	   beq t0, zero, GAME_OVER
+ 	   #lh t0, 4(s3)                # SE A VIDA DA SAMUS FOR ZERO, ENCERRA O JOGO
+ 	   #beq t0, zero, GAME_OVER
  	   
- 	   addi sp, sp, -4            # Ajusta a pilha para salvar ra
-    	   sw ra, 0(sp)               # Salva ra na pilha
-           call PRINT_VIDA_E_ITENS
-           lw ra, 0(sp)               # Restaura ra da pilhad
-           addi sp, sp, 4             # Ajusta a pilha de volta
+ 	   #addi sp, sp, -4             # Ajusta a pilha para salvar ra
+    	   #sw ra, 0(sp)                # Salva ra na pilha
+           #call PRINT_VIDA_E_ITENS
+           #lw ra, 0(sp)                # Restaura ra da pilhad
+           #addi sp, sp, 4              # Ajusta a pilha de volta
  	   
  	   bne s8, zero, NEXT_LEVEL
  	   j GAME_LOOP
@@ -183,11 +181,6 @@ SAMUS_NORMAL:
      
      #------------------------------------------
      
-     li t6, 's'
-     beq t2, t6, CHAR_AGACHA
-     
-     #------------------------------------------
-     
      li t6, 'a'
      beq t2, t6, CHAR_ESQ
      
@@ -195,6 +188,15 @@ SAMUS_NORMAL:
      
      li t6, 'd'
      beq t2, t6, CHAR_DIR
+     
+     #------------------------------------------
+     
+     li t6, 's'
+     
+     lh t0, 6(a4)
+     beq t0, zero, FIM                 # O PERSONAGEM NÃO PODE PULAR SE ESTIVER CAINDO
+     
+     beq t2, t6, CHAR_AGACHA
      
      #-------------------------------------------
      
@@ -730,7 +732,7 @@ ANDANDO_DIR:   addi t1, t1, 15
 
 #-------------------------------------------------------------------------------------------------------
 COLIDE_NORMAL: li t6, 16
-               li t5, 60
+               li t5, 60                 # largura do mapa
 
                div t1, t1, t6
                div t2, t2, t6
@@ -870,6 +872,9 @@ APAGA: 	    lh a1, 0(a4)
             call PRINT
             lw ra, 0(sp)                 # Restaura ra da pilha
             addi sp, sp, 4               # Ajusta a pilha de volta
+            
+            #li a7, 5
+            #ecall
            
             ret
                
@@ -886,13 +891,16 @@ IA_ENTIDADES:  mv a6, s3
 ENTIDADES_LOOP:beq a6, s4, FINAL_LOOP    # QUANDO CHEGA NO FIM DA LISTA, ENCERRA O LOOP
                addi a6, a6, 24
                
+               #li a7, 5
+               #ecall
+               
                lh t1, 0(s3)              # X e Y Samus
 	       lh t2, 2(s3)
               
                lh t3, 4(a6)              # VIDA DA ENTIDADE
 	       beq t3, zero, FIM_DO_TURNO # se o inimigo estiver morto, nada acontece
 	       
-	       lh t3, 6(a3)              # carrega o tipo da entidade
+	       lh t3, 6(a6)              # carrega o tipo da entidade
 	       
 	       li t4, 1
 	       beq t3, t4, SCORPIO_TURN
@@ -914,9 +922,9 @@ ENTIDADES_LOOP:beq a6, s4, FINAL_LOOP    # QUANDO CHEGA NO FIM DA LISTA, ENCERRA
 # PULA PARA O FIM POIS A SAMUS NÃO TEM IA, OU SEJA, DIRETO PARA A FASE DE PRINT
 SAMUS_TURN:    addi sp, sp, -4             # Ajusta a pilha para salvar ra
     	       sw ra, 0(sp)                # Salva ra na pilha
-    	       la a3, ENTIDADES_INFO             # SALVA EM A3 A POSIï¿½ï¿½O X, Y DA SAMUS E OS ATRIBUTOS DE ENTIDADES_INFO (VIDA E TIPO)
-     	       addi a4, a3, 8                    # SALVA EM A4 A POSIï¿½ï¿½O ANTIGA DA SAMUS E OS ATRIBUTOS DE OLD_ENTIDADES_INFO (FRAME ATUAL E FRAME ANTIGO)
-     	       addi a5, a4, 8                    # SALVA EM A5 A PRï¿½XIMA POSIï¿½ï¿½O X DA SAMUS E OS ATRIBUTOS DE NEXT_ENTIDADES_INFO (CIMA/BAIXO E ESQUERDA/DIRETIA)
+    	       mv a3, s3                   # SALVA EM A3 A POSIï¿½ï¿½O X, Y DA SAMUS E OS ATRIBUTOS DE ENTIDADES_INFO (VIDA E TIPO)
+     	       addi a4, a3, 8              # SALVA EM A4 A POSIï¿½ï¿½O ANTIGA DA SAMUS E OS ATRIBUTOS DE OLD_ENTIDADES_INFO (FRAME ATUAL E FRAME ANTIGO)
+     	       addi a5, a4, 8              # SALVA EM A5 A PRï¿½XIMA POSIï¿½ï¿½O X DA SAMUS E OS ATRIBUTOS DE NEXT_ENTIDADES_INFO (CIMA/BAIXO E ESQUERDA/DIRETIA)
                call KEY
                lw ra, 0(sp)                # Restaura ra da pilhad
                addi sp, sp, 4              # Ajusta a pilha de volta
@@ -953,10 +961,10 @@ GRAVIDADE_NAO_AFETA_SAMUS:
 	       li t2, 520                  # CADA SPRITE DA SAMUS POSSUI 520 BYTES E ESTÃO ORGANIZADOS EM ORDEM
 	       mul t1, t1, t2              
 	   
-	       add a0, a0, t1	           # N° SPRITE ATUAL X 520 + SPRITE BASE = ENDEREÇO DO SPRITE QUE QUEREMOS IMPRIMIR   
-	   
+	       add a0, a0, t1	           # N° SPRITE ATUAL X 520 + SPRITE BASE = ENDEREÇO DO SPRITE QUE QUEREMOS IMPRIMIR  
  	       lh a1, 0(s3)                # Imprime a posição X do personagem
  	       lh a2, 2(s3)                # Imprime a posição Y do personagem
+ 	       mv a7, s0
  	       
  	       j PRINT_TURN
 	       
@@ -964,6 +972,29 @@ GRAVIDADE_NAO_AFETA_SAMUS:
 # Descreve o comportamento do tipo de inimigo ESCORPIÃO
 SCORPIO_TURN:  lh a1, 0(a3)              # salva a posição X do Inimigo
 	       lh a2, 2(a3)              # salva a posição Y do Inimigo
+	       
+	       addi t3, t1, 15                # AGORA EM T1 ESTÁ O PRIMEIRO BIT HORIZONTAL DA SAMUS E EM T3 O ÚLTIMO BIT HORIZONTAL DA SAMUS
+	       addi t4, t2, 31                # AGORA EM T2 ESTÁ O PRIMEIRO BIT VERTICAL   DA SAMUS E EM T4 O ÚLTIMO BIT VERTICAL   DA SAMUS
+	       
+	       slt t6, a1, t3                 # VERIFICA SE SCORPIO_X É MENOR QUE O BIT HORIZONTAL DA DIREITA DA SAMUS
+	       slt a5, t1, a1                 # VERIFICA SE O BIT HORIZONTAL DA ESQUERDA DA SAMUS É MENOR QUE PROJ_X
+	       
+	       and a4, t6, a5                 # VERIFICA SE O PROJÉTIL ESTÁ DENTRO DA SAMUS NA HORIZONTAL
+	       
+	       slt t6, a2, t4                 # VERIFICA SE PROJ_Y É MENOR QUE O BIT VERTICAL DE BAIXO DA SAMUS
+	       slt a5, t2, a2                 # VERIFICA SE O BIT VERTICAL DE CIMA DA SAMUS É MENOR QUE PROJ_Y
+	       
+	       and a5, t6, a5                 # VERIFICA SE O PROJÉTIL ESTÁ DENTRO DA SAMUS NA VERTICAL
+	       
+	       and s1, a4, a5                 # VERIFICA SE O PROJÉTIL ESTÁ AO MESMO TEMPO DENTRO DA SAMUS VERTICALMENTE E HORIZONTALMENTE
+	       
+	       li t1, 1
+	       beq s1, t1, PROJETIL_ATAK
+	       j PROJETIL_ANDA
+	       
+	       
+	       
+	       
 	       
 	       sub t3, a2, t2
 	       addi t3, t3, 16           # A POSIÇÃO Y DA SAMUS É A DA CABEÇA A DELA, QUE TEM 32 PIXELS, PARA COMPARAR COM O Y DO ESCORPIÃO PRECISAMOS SOMAR 16
@@ -1093,6 +1124,7 @@ SCORPIO_GRAVIDADE:
 	       add a0, a0, t1	              # N° SPRITE ATUAL X 264 + SPRITE BASE = ENDEREÇO DO SPRITE QUE QUEREMOS IMPRIMIR   
  	       lh a1, 0(a6)                   # Imprime na posição X do personagem
  	       lh a2, 2(a6)                   # Imprime na posição Y do personagem
+ 	       mv a7, s0
  	       
  	       j PRINT_TURN
 #--------------------------------------------------------------------------------------------------------------------------------------
@@ -1150,6 +1182,7 @@ PROJETIL_DIR:  addi sp, sp, -4                # Ajusta a pilha para salvar ra
                la a0, projetil
                lh a1, 0(a6)                  # Imprime a posição X do personagem
  	       lh a2, 2(a6)                  # Imprime a posição Y do personagem
+ 	       mv a7, s0
                j PRINT_TURN
                
 PROJETIL_ESQ:  addi sp, sp, -4               # Ajusta a pilha para salvar ra
@@ -1166,6 +1199,7 @@ PROJETIL_ESQ:  addi sp, sp, -4               # Ajusta a pilha para salvar ra
                la a0, projetil
                lh a1, 0(a6)                   # Imprime a posição X do personagem
  	       lh a2, 2(a6)                   # Imprime a posição Y do personagem
+ 	       mv a7, s0
                j PRINT_TURN
                
 PROJETIL_MORRE:
@@ -1192,15 +1226,15 @@ PRINT_TURN:    #addi sp, sp, -4                # Ajusta a pilha para salvar ra
                #lw ra, 0(sp)                   # Restaura ra da pilha
                #addi sp, sp, 4                 # Ajusta a pilha de volta
                
+               #li a7, 5
+               #ecall
+               
                lh t0, 4(a5)                   # VALOR QUE INDICa PARA QUAL DIREÇÃO O PERSONAGEM ESTÁ INDO     
                beq t0, zero, PRINT_ESQ
                j PRINT_DIR
                
 PRINT_ESQ:     addi sp, sp, -4                # Ajusta a pilha para salvar ra
     	       sw ra, 0(sp)                   # Salva ra na pilha
-    	       lh a1, 0(a6)                   # Imprime a posição X do personagem
- 	       lh a2, 2(a6)                   # Imprime a posição Y do personagem
- 	       mv a7, s0
                call PRINT
                # A FUNÇÃO PRINT_ESQ AINDA NÃO EXISTE, ENTÃO ESTOU CHAMANDO A FUNÇÃO DE IMPRIMIR NORMAL
                lw ra, 0(sp)                   # Restaura ra da pilha
@@ -1211,9 +1245,6 @@ PRINT_ESQ:     addi sp, sp, -4                # Ajusta a pilha para salvar ra
                
 PRINT_DIR:     addi sp, sp, -4                # Ajusta a pilha para salvar ra
     	       sw ra, 0(sp)                   # Salva ra na pilha
-    	       lh a1, 0(a6)                   # Imprime a posição X do personagem
- 	       lh a2, 2(a6)                   # Imprime a posição Y do personagem
- 	       mv a7, s0
                call PRINT
                lw ra, 0(sp)                   # Restaura ra da pilha
                addi sp, sp, 4                 # Ajusta a pilha de volta
@@ -1466,9 +1497,9 @@ NEXT_PIXEL:
 .data
 #--------------------------------------------------LISTAS------------------------------------------------------------------------
 
-ENTIDADES_INFO: .half 16, 48, 5, 0,              # X = 32, Y = 32, Vida = 10, Tipo da entidade = 0       (CHAR_POS, VIDA, TIPO)
-                      16, 48, 0, 1,               # X = 32, Y = 32, Frame atual = 0, BAIXO (0) /PARADO (1) / CIMA (2) = 1    (OLD_CHAR_POS, FRAMES_ANIMAÇÃO)
-                      16, 48, 3, 1                # X = 32, Y = 32, ESQ (0)/ PARADO (1) /DIR (2) = 1, ÍNDICE                   (NEXT_CHAR_POS, ESQ/DIR, ÍNDICE)
+ENTIDADES_INFO: .half 16, 32, 5, 0,              # X = 32, Y = 32, Vida = 10, Tipo da entidade = 0       (CHAR_POS, VIDA, TIPO)
+                      16, 32, 0, 1,               # X = 32, Y = 32, Frame atual = 0, BAIXO (0) /PARADO (1) / CIMA (2) = 1    (OLD_CHAR_POS, FRAMES_ANIMAÇÃO)
+                      16, 32, 3, 1                # X = 32, Y = 32, ESQ (0)/ PARADO (1) /DIR (2) = 1, ÍNDICE                   (NEXT_CHAR_POS, ESQ/DIR, ÍNDICE)
                       
 		.space 576                        # Cada entidade tem 24 bytes, quero que a lista tenha 25 entidades
 
@@ -1543,21 +1574,39 @@ fundo_preto: .word 16, 16
 
 #--------------------------------------------------MAPAS------------------------------------------------------------------------
 
-mapa_1: .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	            0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
+mapa_1: #.word 60, 15
+        .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	      0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
               0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,9,9,9,9,8,9,9,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
+              0,9,9,9,9,9,9,9,9,9,9,8,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
+              0,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
               0,0,0,0,0,0,0,0,0,0,9,9,0,9,9,9,9,9,0,0,9,0,0,0,0,0,0,0,0,9,9,9,0,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
               0,0,9,9,9,9,9,9,0,1,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,1,9,9,0,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,9,9,9,9,9,0,9,9,9,0,9,8,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,0,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
+              0,9,9,9,9,9,9,9,0,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,0,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
               0,9,9,9,9,9,9,0,0,9,9,9,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,0,0,9,9,9,0,0,0,9,9,9,9,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
               0,9,9,9,9,0,0,0,9,9,9,1,0,9,9,9,9,9,0,0,0,9,9,9,9,0,0,0,9,9,9,1,0,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
               0,9,9,9,0,0,9,9,9,9,9,9,0,9,9,9,9,0,0,0,0,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
               0,9,9,0,0,9,9,9,9,9,9,9,0,9,9,9,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,0,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
               0,9,9,9,9,9,9,9,9,9,1,9,9,9,9,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
-              0,1,9,9,9,8,9,9,9,1,1,9,9,9,1,0,0,0,0,0,0,0,0,1,9,9,9,9,9,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
-              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+              0,1,9,9,9,9,9,9,9,1,1,9,9,9,1,0,0,0,0,0,0,0,0,1,9,9,9,9,9,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              
+mapa_2: .word 80, 15
+        .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,9,9,9,9,9,9,9,0,0,0,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,9,9,9,9,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,0,9,9,9,9,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,0,9,9,9,9,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,0,9,9,9,9,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,0,0,9,9,9,9,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,0,9,9,9,9,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,
+	      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 
 #-------------------------------------------------SPRITES SAMUS-----------------------------------------------------------------
 
