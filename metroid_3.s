@@ -1,34 +1,34 @@
 .text
 # s0 = CONTADOR DE FRAME PARA GAME_LOOP
 
-# s1 = GUARDA O √çNDICE DA LINHA NA HORA DE PRINTAR O MAPA / ARMAZENA SE O PERSONAGEM IR√Å COLIDIR OU N√ÉO (1 PARA SIM E 0 PARA N√ÉO)
-# S2 = GUARDA O √çNDICE DA COLUNA NA HORA DE PRINTAR O MAPA
+# s1 = GUARDA O ÕNDICE DA LINHA NA HORA DE PRINTAR O MAPA / ARMAZENA SE O PERSONAGEM IR¡ COLIDIR OU N√O (1 PARA SIM E 0 PARA N√O)
+# S2 = GUARDA O ÕNDICE DA COLUNA NA HORA DE PRINTAR O MAPA
 
-# S3 = PONTEIRO DA CABE√áA DAS LISTAS ENTIDADES_INFO, OLD ENTIDADES_INFO E NEXT_ENTIDADES_INFO
-# S4 = PONTEIRO QUE INDICA O ENDERE√áO PARA ADICIONAR O PR√ìXIMO ITEM NA LISTAS
+# S3 = PONTEIRO DA CABE«A DAS LISTAS ENTIDADES_INFO, OLD ENTIDADES_INFO E NEXT_ENTIDADES_INFO
+# S4 = PONTEIRO QUE INDICA O ENDERE«O PARA ADICIONAR O PR”XIMO ITEM NA LISTAS
 
 # S5 = ARMAZENA QUANTAS VEZES O PERSONAGEM PODE IR PARA CIMA NO PULO 
-# S6 = IN√âRCIA, ARMAZENA SE O PERSONAGEM PULOU PARA A DIREITA OU PARA A ESQUERDA (0 = ESQUERDA, 1, RETO, 2 DIREITA)
+# S6 = IN…RCIA, ARMAZENA SE O PERSONAGEM PULOU PARA A DIREITA OU PARA A ESQUERDA (0 = ESQUERDA, 1, RETO, 2 DIREITA)
 
-# S7 = ITENS DA SAMUS, SE S7 = 0, SAMUS N√ÉO TEM NENHUM ITEM, S7 = 1, SAMUS GANHA A HABILIDADE DE VIRAR A BOLA, S7 = 2, SAMUS GANHA O TIRO FOGUETE
-# S8 = SALVA SE O PERSONAGEM GANHOU O JOGO / PASSOU DE N√çVEL
+# S7 = ITENS DA SAMUS, SE S7 = 0, SAMUS N√O TEM NENHUM ITEM, S7 = 1, SAMUS GANHA A HABILIDADE DE VIRAR A BOLA, S7 = 2, SAMUS GANHA DOBRO DE DANO
+# S8 = SALVA QUANTAS CHAVES O JOGADOR J¡ RECOLHEU PARA GANHAR O JOGO / SALVA SE O JOGADOR GANHOU O JOGO
 
-# S9 =  n√∫mero de passos da Samus at√© trocar de mapa
+# S9 =  n˙mero de passos da Samus atÈ trocar de mapa
 # S10 = SALVA O QUANTO A SAMUS PODE ANDAR
 # S11 = SALVA O MAPA ATUAL
 
-MAIN: la s3, ENTIDADES_INFO       # ENDERE√áO DA LISTA CONTENDO AS ENTIDADES
-      addi s4, s3, 24             # ENDERE√áO DA LISTA ONDE DEVE SER SALVO O PR√ìXIMO ITEM
+MAIN: la s3, ENTIDADES_INFO       # ENDERE«O DA LISTA CONTENDO AS ENTIDADES
+      addi s4, s3, 24             # ENDERE«O DA LISTA ONDE DEVE SER SALVO O PR”XIMO ITEM
       
       la, s11, mapa_1
       addi s9, s11, 4
-      li s10, 16
+      li s10, 20
       
       li s5, 0 
       li s7, 0
       li s8, 0
       call SETUP
-      
+    
       #la s11, mapa_2
       #mv s9, s11
       #li s10, sla
@@ -46,15 +46,15 @@ SETUP:     addi sp, sp, -4             # Ajusta a pilha para salvar ra
     	   sw ra, 0(sp)                # Salva ra na pilha
     	   li a1, 0                    # INICIALIZA X E Y COMO ZERO
     	   li a2, 0
-    	   li s1, 0                    # √≠¬Ωndice da linha
-	   li s2, 0                    # √≠ndice da coluna
+    	   li s1, 0                    # ÌΩndice da linha
+	   li s2, 0                    # Ìndice da coluna
            call PRINT_MAP
            lw ra, 0(sp)                # Restaura ra da pilha
            addi sp, sp, 4              # Ajusta a pilha de volta
 	   
-	   li s1, 0                    # frame de colis√£o
+	   li s1, 0                    # frame de colis„o
 	   addi s9, s11, 4
-	   li s0, 0                    # Frame de in√≠cio
+	   li s0, 0                    # Frame de inÌcio
     	   
 	   addi sp, sp, -4             # Ajusta a pilha para salvar ra
     	   sw ra, 0(sp)                # Salva ra na pilha
@@ -64,49 +64,49 @@ SETUP:     addi sp, sp, -4             # Ajusta a pilha para salvar ra
 	   
 	   ret
 	   
-GAME_OVER: li a7, 10                  # VEM PARA C√Å SE A VIDA DA SAMUS FOR ZERO
+GAME_OVER: li a7, 10                  # VEM PARA C¡ SE A VIDA DA SAMUS FOR ZERO
            ecall 
 	   
 #------------------------------------------------------------------------GAME LOOP--------------------------------------------------------------------
        
 GAME_LOOP: xori s0, s0, 1
-            
-           li t1, 320
-           addi t0, s10, 16
-           rem t2,t0, t1
-           beq t2, zero, ANDA_MAPA_DIR
+
+           li t0, 624
+           bgt s10, t0, SEGUE_LOOP
            
+           li t0, 16
+           rem t2, s10, t0
            
-	   rem t0, s10, t1
-	   beq t0, zero, ANDA_MAPA_ESQ
-           
-           #li a7, 5
-           #ecall 
+           beq t2, zero, ANDA_MAPA
            
            j SEGUE_LOOP
            
            #-------------------------------------------------------------------------------------------------------
+ANDA_MAPA: addi a5, s3, 16
+           lh t0, 4(a5)
+           beq t0, zero, ANDA_MAPA_ESQ
+
 ANDA_MAPA_DIR:
-            addi s4, s3, 24             # REINICIA A LISTA DE ENTIDADES
+           addi s4, s3, 24             # REINICIA A LISTA DE ENTIDADES
             
-            addi s10, s10, 20
-            addi s9, s9, 20
+           addi s10, s10, 4
+           addi s9, s9, 1
             
-            li t0, 4
-            sh t0, 0(s3)
-            sh t0, 8(s3)              # COLOCA A SAMUS NA POSI√á√ÉO ZERO EM CHAR_POS, OLD_CHAR_POS E NEXT_CHAR_POS
-            sh t0, 16(s3)
-            
-            j PRINTA_MAPA
+           li t0, 20
+           sh t0, 0(s3)
+           sh t0, 8(s3)              # COLOCA A SAMUS NA POSI«√O ZERO EM CHAR_POS, OLD_CHAR_POS E NEXT_CHAR_POS
+           sh t0, 16(s3)
+           j PRINTA_MAPA
+           
 ANDA_MAPA_ESQ:
            addi s4, s3, 24              # REINICIA A LISTA DE ENTIDADES
           
-           addi s10, s10, -20
-           addi s9, s9, -20
+           addi s10, s10, -4
+           addi s9, s9, -1
            
-           li t0, 300
+           li t0, 24
            sh t0, 0(s3)
-           sh t0, 8(s3)              # COLOCA A SAMUS NA POSI√á√ÉO 304 EM CHAR_POS, OLD_CHAR_POS E NEXT_CHAR_POS
+           sh t0, 8(s3)              # COLOCA A SAMUS NA POSI«√O 304 EM CHAR_POS, OLD_CHAR_POS E NEXT_CHAR_POS
            sh t0, 16(s3)
 
 PRINTA_MAPA:
@@ -116,8 +116,8 @@ PRINTA_MAPA:
     	   sw ra, 0(sp)                # Salva ra na pilha
     	   li a1, 0                    # INICIALIZA X E Y COMO ZERO
     	   li a2, 0
-    	   li s1, 0                    # √≠¬Ωndice da linha
-	   li s2, 0                    # √≠ndice da coluna
+    	   li s1, 0                    # ÌΩndice da linha
+	   li s2, 0                    # Ìndice da coluna
            call PRINT_MAP
            lw ra, 0(sp)                # Restaura ra da pilha
            addi sp, sp, 4              # Ajusta a pilha de volta
@@ -135,7 +135,7 @@ SEGUE_LOOP:addi sp, sp, -4             # Ajusta a pilha para salvar ra
 DELAY:     li t0, 1                    # Define o valor do contador (ajuste para o atraso desejado)
   
 DELAY_LOOP:addi t0, t0, -1             # Decrementa o contador
-           beq t0, zero, VOLTA_LOOP    # Se o contador n√£o chegou a 0, continua o loop
+           beq t0, zero, VOLTA_LOOP    # Se o contador n„o chegou a 0, continua o loop
            j DELAY_LOOP                # Retorna quando o contador atingir 0
 
 VOLTA_LOOP:li t0, 0xFF200604
@@ -150,27 +150,28 @@ VOLTA_LOOP:li t0, 0xFF200604
            #lw ra, 0(sp)                # Restaura ra da pilhad
            #addi sp, sp, 4              # Ajusta a pilha de volta
  	   
- 	   bne s8, zero, NEXT_LEVEL
+ 	   li t0, 4
+ 	   beq s8, t0, NEXT_LEVEL
  	   j GAME_LOOP
  	   
-NEXT_LEVEL:  ret                       # QUANDO O PERSONAGEM PASSA DE FASE, O LOOP ACABA E ELE VOLTA PARA SETUP, ONDE O SEGUNDO MAPA SER√Ø¬ø¬Ω CARREGADO E O LOOP RETORNA
+NEXT_LEVEL:  ret                       # QUANDO O PERSONAGEM PASSA DE FASE, O LOOP ACABA E ELE VOLTA PARA SETUP, ONDE O SEGUNDO MAPA SERÔøΩ CARREGADO E O LOOP RETORNA
 
-#------------------------------------------------A√á√ïES QUE O JOGADOR PODE FAZER COM O TECLADO PARA A SAMUS REALIZAR-----------------------------------------------------------------------
+#------------------------------------------------A«’ES QUE O JOGADOR PODE FAZER COM O TECLADO PARA A SAMUS REALIZAR-----------------------------------------------------------------------
 
-KEY: li t1, 0xFF200000                 # carrega o endere√Ø¬ø¬Ωo do controle do KDMMIO
+KEY: li t1, 0xFF200000                 # carrega o endereÔøΩo do controle do KDMMIO
      lw t0, 0(t1)                      # Le bit de Controle Teclado
      andi t0, t0, 0x0001               # mascara o bit menos significativo
-     beq t0, zero, FIM                 # Se n√Ø¬ø¬Ωo h√Ø¬ø¬Ω tecla pressionada ent√Ø¬ø¬Ωo vai para FIM
+     beq t0, zero, FIM                 # Se nÔøΩo hÔøΩ tecla pressionada entÔøΩo vai para FIM
      lw t2, 4(t1)                      # le o valor da tecla tecla
      
-     lh t0, 6(a3)                      # DEPENDENDO DO ESTADO EM QUE A SAMUS SE ENCONTRA, SUAS A√á√ïES POSS√çVEIS S√ÉO DIFERENTES
+     lh t0, 6(a3)                      # DEPENDENDO DO ESTADO EM QUE A SAMUS SE ENCONTRA, SUAS A«’ES POSSÕVEIS S√O DIFERENTES
      
-     beq t0, zero, SAMUS_NORMAL        # SAMUS EM P√â
+     beq t0, zero, SAMUS_NORMAL        # SAMUS EM P…
      
      li t1, 2
      beq t0, t1, SAMUS_AGACHADA
      
-     li t1, 3
+     li t1, 1
      beq t0, t1, SAMUS_BOLA         
      
  #---------------------------------------------
@@ -189,22 +190,39 @@ SAMUS_NORMAL:
      li t6, 'd'
      beq t2, t6, CHAR_DIR
      
-     #------------------------------------------
+     #------------------------------------------             NENHUMA DAS PR”XIMAS A«’ES PODE SER REALIZADA DURANTE UM PULO OU QUEDA
      
-     li t6, 's'
+     li t6, 'e'
+     beq t2, t6, QUER_VIRAR_BOLA
+     j SEGUE_NORMAL
      
+QUER_VIRAR_BOLA:
      lh t0, 6(a4)
-     beq t0, zero, FIM                 # O PERSONAGEM N√ÉO PODE PULAR SE ESTIVER CAINDO
+     beq t0, zero, FIM                 # O PERSONAGEM N√O PODE VIRAR BOLA SE ESTIVER CAINDO
+     
+     li t0, 1
+     beq s7, t0, VIRAR_BOLA
+     
+     
+     #------------------------------------------
+SEGUE_NORMAL: 
+     li t6, 's'
+     beq t2, t6, QUER_AGACHAR
+     j SEGUE_NORMAL_2
+     
+QUER_AGACHAR:
+     lh t0, 6(a4)
+     beq t0, zero, SEGUE_NORMAL_2      # O PERSONAGEM N√O PODE AGACHAR SE ESTIVER CAINDO
      
      beq t2, t6, CHAR_AGACHA
      
      #-------------------------------------------
-     
+SEGUE_NORMAL_2:     
      li t6, 'w'
-     bne s5, zero, FIM                 # O PERSONAGEM N√ÉO PODE SE MOVER ENQUANTO ESTIVER PULANDO
+     bne s5, zero, FIM                 # O PERSONAGEM N√O PODE SE MOVER ENQUANTO ESTIVER PULANDO
      
      lh t0, 6(a4)
-     beq t0, zero, FIM                 # O PERSONAGEM N√ÉO PODE PULAR SE ESTIVER CAINDO
+     beq t0, zero, FIM                 # O PERSONAGEM N√O PODE PULAR SE ESTIVER CAINDO
      
      beq t2, t6, CHAR_PULA
      
@@ -225,6 +243,11 @@ SAMUS_AGACHADA:
      
 #------------------------------------------
 SAMUS_BOLA:
+
+     li t6, 'e'
+     beq t2, t6, VIRAR_HUMANA
+     
+     #-------------------------------------------
      
      li t6, 'a'
      beq t2, t6, CHAR_ESQ
@@ -237,10 +260,10 @@ SAMUS_BOLA:
      #-------------------------------------------
      
      li t6, 'w'
-     bne s5, zero, FIM                 # O PERSONAGEM N√ÉO PODE SE MOVER ENQUANTO ESTIVER PULANDO
+     bne s5, zero, FIM                 # O PERSONAGEM N√O PODE SE MOVER ENQUANTO ESTIVER PULANDO
      
      lh t0, 6(a4)
-     beq t0, zero, FIM                 # O PERSONAGEM N√ÉO PODE PULAR SE ESTIVER CAINDO
+     beq t0, zero, FIM                 # O PERSONAGEM N√O PODE PULAR SE ESTIVER CAINDO
      
      beq t2, t6, CHAR_PULA
      
@@ -267,12 +290,55 @@ PARA_OLHANDO_DIR:
      sh t0, 4(a5)
      ret
 
-#---------------------------------------------------------CRIAR UM PROOJ√âTIL E ATIRAR------------------------------------------------------------------
+#-----------------------------------------------------------MODO BOLA---------------------------------------------------------------------------------
+
+VIRAR_BOLA:
+           addi sp, sp, -4             # Ajusta a pilha para salvar ra
+    	   sw ra, 0(sp)                # Salva ra na pilha
+           call OLD_POS
+           lw ra, 0(sp)                # Restaura ra da pilha
+           addi sp, sp, 4              # Ajusta a pilha de volta
+	   
+	   mv a3, s3
+	   
+	   lh a2, 2(a3)                # AUMENTA A POS Y DA SAMUS EM 16
+           addi a2, a2, 16
+           sh a2, 2(a5)
+           sh a2, 2(a3)
+           sh a2, 2(a4)
+	   
+           li t0, 1
+           sh t0, 6(a3)                # MUDA O TIPO DA SAMUS PARA O TIPO DE UN INIMIGO 16 X 16 PIXELS
+           
+           li t0, 7
+           sh t0, 4(a4)                # MUDA O FRAME ATUAL DA SAMUS PARA O FRAME AGACHAR
+           ret
+
+VIRAR_HUMANA:
+           addi sp, sp, -4             # Ajusta a pilha para salvar ra
+    	   sw ra, 0(sp)                # Salva ra na pilha
+           call OLD_POS
+           lw ra, 0(sp)                # Restaura ra da pilha
+           addi sp, sp, 4              # Ajusta a pilha de volta
+           
+           mv a3, s3
+           
+           lh a2, 2(a3)                # AUMENTA A POS Y DA SAMUS EM 16
+           addi a2, a2, -16
+           sh a2, 2(a5)
+           sh a2, 2(a3)
+           sh a2, 2(a4)
+
+           sh zero, 6(a3)              # MUDA O TIPO DE ENTIDADE DA SAMUS
+           sh zero, 4(a4)              # MUDA O FRAME ATUAL DA SAMUS PARA PARADA
+           ret
+
+#---------------------------------------------------------CRIAR UM PROJ…TIL E ATIRAR------------------------------------------------------------------
 
 ATIRAR:    lh a1, 0(a3)
            lh a2, 2(a3)
            
-           lh t0, 4(a3)                # PEGA O TIPO DA ENTIDADE QUE ATIROU (PRECISA SER A ENTIDADE E N√ÉO O √çNDICE POIS A SAMUS MUDA DE TIPO)
+           lh t0, 4(a3)                # PEGA O TIPO DA ENTIDADE QUE ATIROU (PRECISA SER A ENTIDADE E N√O O ÕNDICE POIS A SAMUS MUDA DE TIPO)
            lh t1, 4(a5)                # ESQ/PARADO_ESQ/PARADO_DIR/DIR
           
            beq t0, zero, TIRO_SAMUS
@@ -280,6 +346,8 @@ ATIRAR:    lh a1, 0(a3)
            #-------------------------------------------
            
 TIRO_ENTIDADE:   
+           li a3, 1                   # TODA ENTIDADE D¡ 1 DE DANO
+           
            li t2, 0        
            beq t2, t1, CRIA_ESQUERDA_PRO_ENT
            
@@ -306,7 +374,15 @@ CRIA_DIREITA_PRO_ENT:
        
        #------------------------------------------------------------
        
-TIRO_SAMUS:li t2, 0
+TIRO_SAMUS:li t0, 2
+           beq s7, t0, DANO_EXTRA 
+           
+           li a3, 1
+           j SEGUE_TIRO
+           
+DANO_EXTRA: li a3, 3
+
+SEGUE_TIRO:li t2, 0
            beq t2, t1, CRIA_ESQUERDA_PRO_SAMUS
            
            li t2, 1
@@ -336,7 +412,7 @@ CRIA_DIREITA_PRO_SAMUS:
 CRIA_PROJETIL:           
            addi sp, sp, -4             # Ajusta a pilha para salvar ra
 	   sw ra, 0(sp)                # Salva ra na pilha
-	   li a3, 1                    # VIDA DA ENTIDADE
+	   #li a3, 1                    # DANO DO TIRO, (PARA PROJ…TEIS, 4(A3) GUARDA O DANO AO INV…S DA VIDA, )
 	   li a4, 3                    # TIPO DA ENTIDADE
 	   call ADD_ITEM
 	   lw ra, 0(sp)                # Restaura ra da pilha
@@ -387,9 +463,9 @@ CHAR_LEVANTA:
            sh zero, 4(a4)              # MUDA O FRAME ATUAL DA SAMUS PARA PARADA
            ret
            
-#------------------------------------------------CHAR DEFINE A ALTURA DO PULO E A IN√âRCIA--------------------------------------------------------------------------------------------
+#------------------------------------------------CHAR DEFINE A ALTURA DO PULO E A IN…RCIA--------------------------------------------------------------------------------------------
 
-CHAR_PULA: li s5, 32                   # 36 PIXELS PARA CIMA E 16 PARA OS LADOS, CASO HAJA IN√âRCIA, OU APENAS 48 PIXELS PARA CIMA
+CHAR_PULA: li s5, 32                   # 36 PIXELS PARA CIMA E 16 PARA OS LADOS, CASO HAJA IN…RCIA, OU APENAS 48 PIXELS PARA CIMA
   
            lh t0, 4(a5)                # ESQ/PARADO/DIR
                  
@@ -417,8 +493,8 @@ INERCIA_DIR:
            li s6, 2
            ret
                  
-#------------------------------------------------MOVIMENTA√á√ÉO EM 4 EIXOS DA SAMUS-------------------------------------------------------------------------------------
-CHAR_ESQ:  sh zero, 4(a5)              # muda o valor ESQUERDA/DIREITA do personagem para 0, pois ele esta¬¥andando para a ESQUERDA
+#------------------------------------------------MOVIMENTA«√O EM 4 EIXOS DA SAMUS-------------------------------------------------------------------------------------
+CHAR_ESQ:  sh zero, 4(a5)              # muda o valor ESQUERDA/DIREITA do personagem para 0, pois ele esta¥andando para a ESQUERDA
 
            lh t0, 6(a5)
            li t1, 1
@@ -426,9 +502,11 @@ CHAR_ESQ:  sh zero, 4(a5)              # muda o valor ESQUERDA/DIREITA do person
            j ENTIDADE_HOR_POS_ESQ
 
 SAMUS_HOR_POS_ESQ:
-           mv a1, s10
+           lh a1, 0(a5)
            addi a1, a1, -4
            sh a1, 0(a5)
+           
+           mv a1, s10
            lh a2, 2(a5)
            j SEGUE_CHAR_ESQ
            
@@ -445,7 +523,7 @@ SEGUE_CHAR_ESQ:
            lw ra, 0(sp)                # Restaura ra da pilha
            addi sp, sp, 4              # Ajusta a pilha de volta
            
-           lh t0, 6(a5)                # CHAMA O √çNDICE DA ENTIDADE QUE SER√Ø√Å CALCULADA A COLIS√ÉO, POIS A SAMUS TEM COLIS√ÉO ESPECIAL
+           lh t0, 6(a5)                # CHAMA O ÕNDICE DA ENTIDADE QUE SERÔ¡ CALCULADA A COLIS√O, POIS A SAMUS TEM COLIS√O ESPECIAL
            li t1, 1
            beq t0, t1, COL_SAMUS_HOR
            
@@ -454,7 +532,7 @@ SEGUE_CHAR_ESQ:
            #-------------------------------------------------------------------------------------------------------------------------------------
 	  
 CHAR_DIR:  li t0, 2
-           sh t0, 4(a5)                # muda o valor ESQUERDA/DIREITA do personagem para 2, pois ele est√° andando para a DIREITA
+           sh t0, 4(a5)                # muda o valor ESQUERDA/DIREITA do personagem para 2, pois ele est· andando para a DIREITA
            
            lh t0, 6(a5)
            li t1, 1
@@ -462,9 +540,11 @@ CHAR_DIR:  li t0, 2
            j ENTIDADE_HOR_POS_DIR
 
 SAMUS_HOR_POS_DIR:
-           mv a1, s10
+           lh a1, 0(a5)
            addi a1, a1, 4
            sh a1, 0(a5)
+           
+           mv a1, s10
            lh a2, 2(a5)
            j SEGUE_CHAR_DIR
            
@@ -481,7 +561,7 @@ SEGUE_CHAR_DIR:
            lw ra, 0(sp)                # Restaura ra da pilha
            addi sp, sp, 4              # Ajusta a pilha de volta
               
-           lh t0, 6(a5)                # CHAMA O √çNDICE DA ENTIDADE QUE SER√Ø√Å CALCULADA A COLIS√ÉO, POIS A SAMUS TEM COLIS√ÉO ESPECIAL
+           lh t0, 6(a5)                # CHAMA O ÕNDICE DA ENTIDADE QUE SERÔ¡ CALCULADA A COLIS√O, POIS A SAMUS TEM COLIS√O ESPECIAL
            li t1, 1
            beq t0, t1, COL_SAMUS_HOR
            
@@ -491,8 +571,28 @@ SEGUE_CHAR_DIR:
            
 COL_SAMUS_HOR:
            bne s1, zero, BATEU_NUMA_PAREDE  
+           
+           lh t0, 6(a3)
+           beq t0, zero, SAMUS_HUMANA
+           
+           li t1, 1
+           beq t0, t1, SAMUS_BOLA_DIRECAO
 
-           addi a2, a2, 16             # ADICIONA 16 √Ø¬ø¬Ω POSI√Ø¬ø¬Ω√Ø¬ø¬ΩO Y DA SAMUS E CHAMA A COLIS√Ø¬ø¬ΩO DE NOVO, OU SEJA, CALCULA A COLIS√Ø¬ø¬ΩO DA PARTE DE BAIXO
+SAMUS_BOLA_DIRECAO:
+           lh t0, 4(a5)
+           beq t0, zero, S10_MENOS_4_BOLA
+           j S10_MAIS_4_BOLA
+           
+S10_MENOS_4_BOLA:
+           addi s10, s10, -4
+           j SAMUS_RESUL_COL
+           
+S10_MAIS_4_BOLA:
+            addi s10, s10, 4
+            j SAMUS_RESUL_COL
+
+SAMUS_HUMANA:
+           addi a2, a2, 16             # ADICIONA 16 ÔøΩ POSIÔøΩÔøΩO Y DA SAMUS E CHAMA A COLISÔøΩO DE NOVO, OU SEJA, CALCULA A COLISÔøΩO DA PARTE DE BAIXO
            
            addi sp, sp, -4             # Ajusta a pilha para salvar ra
     	   sw ra, 0(sp)                # Salva ra na pilha
@@ -500,7 +600,7 @@ COL_SAMUS_HOR:
            lw ra, 0(sp)                # Restaura ra da pilha
            addi sp, sp, 4              # Ajusta a pilha de volta
            
-           bne s1, zero, BATEU_NUMA_PAREDE      # S1 ARMAZENA SE O PERSONAGEM IR√Å COLIDIR OU N√ÉO, 1 PARA COLIDIR E 0 PARA N√ÉO
+           bne s1, zero, BATEU_NUMA_PAREDE      # S1 ARMAZENA SE O PERSONAGEM IR¡ COLIDIR OU N√O, 1 PARA COLIDIR E 0 PARA N√O
            
            lh t0, 4(a5)
            beq t0, zero, S10_MENOS_4
@@ -513,11 +613,11 @@ S10_MAIS_4: addi s10, s10, 4
 
 
 S10_MENOS_4:addi s10, s10, -4
-           j SAMUS_RESUL_COL
+            j SAMUS_RESUL_COL
 
 COL_ENTIDADE_HOR:
-           bne s1, zero, BATEU_NUMA_PAREDE      # S1 ARMAZENA SE O PERSONAGEM IR√Å COLIDIR OU N√ÉO, 1 PARA COLIDIR E 0 PARA N√ÉO
-           j ENTIDADE_RESUL_COL       
+            bne s1, zero, BATEU_NUMA_PAREDE      # S1 ARMAZENA SE O PERSONAGEM IR¡ COLIDIR OU N√O, 1 PARA COLIDIR E 0 PARA N√O
+            j ENTIDADE_RESUL_COL       
            
            #----------------------------------------------------- 
            
@@ -613,7 +713,7 @@ ENTIDADE_ATERRISA:
             j CHAR_RET
             
 COL_VER_RESUL:
-            lh t0, 6(a5)               # CHAMA O √çNDICE DA ENTIDADE
+            lh t0, 6(a5)               # CHAMA O ÕNDICE DA ENTIDADE
             li t1, 1
             beq t0, t1, SAMUS_RESUL_COL
             j ENTIDADE_RESUL_COL
@@ -666,7 +766,7 @@ BATEU_A_CABECA:
             sh zero, 6(a4)
             j CHAR_RET
             
-#---------------------------------------OPERA√á√ïES QUE USAM CHAR_CIMA----------------------------------------------------------------------------
+#---------------------------------------OPERA«’ES QUE USAM CHAR_CIMA----------------------------------------------------------------------------
 
 CHAR_SOBE:       li t1, 3
                  rem t0, s5, t1
@@ -697,14 +797,14 @@ IMPULSO_ESQ:     j CHAR_ESQ
 
 IMPULSO_DIR:     j CHAR_DIR
                  
-#----------------------------------------------------------COLIS√ÉO HORIZONTAL E VERTICAL--------------------------------------------------------------------------------------------------
+#----------------------------------------------------------COLIS√O HORIZONTAL E VERTICAL--------------------------------------------------------------------------------------------------
 CHECK_COLISAO_VER:
                mv t1, a1                      # Carrega a NEXT coordenada X
                mv t2, a2                      # Carrega a NEXT coordenada Y
                
-COLIDE_BAIXO:  lh t0, 6(a4)                   # PEGA O¬¥VALOR QUE INDICA SE O PERSONAGEM EST√Å INDO PARA BAIXO, PARADO, OU PARA CIMA
+COLIDE_BAIXO:  lh t0, 6(a4)                   # PEGA O¥VALOR QUE INDICA SE O PERSONAGEM EST¡ INDO PARA BAIXO, PARADO, OU PARA CIMA
                
-               beq t0, zero, DESCE            # VERIFICA SE A ENTIDADE EST√Ø¬ø¬Ω ANDANDO PARA A CIMA, NESSE CASO, √Ø¬ø¬Ω NECESS√Ø¬ø¬ΩRIO SOMAR 15 NA POS X PARA CALCULAR A POSI√Ø¬ø¬Ω√Ø¬ø¬ΩO
+               beq t0, zero, DESCE            # VERIFICA SE A ENTIDADE ESTÔøΩ ANDANDO PARA A CIMA, NESSE CASO, ÔøΩ NECESSÔøΩRIO SOMAR 15 NA POS X PARA CALCULAR A POSIÔøΩÔøΩO
                j COLIDE_NORMAL
                
 DESCE:         lh t0, 6(a3)
@@ -725,7 +825,7 @@ CHECK_COLISAO_HOR:
 COLIDE_DIR:    li t0, 2
                lh t3, 4(a5)
                
-               beq t3, t0, ANDANDO_DIR   # VERIFICA SE A ENTIDADE EST√Ø¬ø¬Ω ANDANDO PARA A DIREITA, NESSE CASO, √Ø¬ø¬Ω NECESS√Ø¬ø¬ΩRIO SOMAR 15 NA POS X PARA CALCULAR A POSI√Ø¬ø¬Ω√Ø¬ø¬ΩO
+               beq t3, t0, ANDANDO_DIR   # VERIFICA SE A ENTIDADE ESTÔøΩ ANDANDO PARA A DIREITA, NESSE CASO, ÔøΩ NECESSÔøΩRIO SOMAR 15 NA POS X PARA CALCULAR A POSIÔøΩÔøΩO
                j COLIDE_NORMAL
 
 ANDANDO_DIR:   addi t1, t1, 15
@@ -733,17 +833,17 @@ ANDANDO_DIR:   addi t1, t1, 15
 #-------------------------------------------------------------------------------------------------------
 COLIDE_NORMAL: li t6, 16
                #li t5, 60
-               lw t5, 0(s11)                # largura do mapa
+               lw t5, 0(s11)             # largura do mapa
 
                div t1, t1, t6
                div t2, t2, t6
                
-               mul t2, t2, t5            # AP√Ø¬ø¬ΩS A DIVIS√Ø¬ø¬ΩO, T2 POSSUI A LINHA Y DA MATRIZ MAPA ONDE A PARTE DE BAIXO DA SAMUS (OU UMA ENTIDADE DE TAMANHO 16) EST√Ø¬ø¬Ω
+               mul t2, t2, t5            # APÔøΩS A DIVISÔøΩO, T2 POSSUI A LINHA Y DA MATRIZ MAPA ONDE A PARTE DE BAIXO DA SAMUS (OU UMA ENTIDADE DE TAMANHO 16) ESTÔøΩ
                                       
-               add t2, t1, t2            # AP√Ø¬ø¬ΩS MULTIPLICAR POR 20 E SOMAR COM A COMPONENTE X, TEMOS EXATAMENTE O BYTE PARA ONDE SAMUS ANDAR√Ø¬ø¬Ω
+               add t2, t1, t2            # APÔøΩS MULTIPLICAR POR 20 E SOMAR COM A COMPONENTE X, TEMOS EXATAMENTE O BYTE PARA ONDE SAMUS ANDARÔøΩ
                
                addi t4, s11, 4
-               add t4, t4, t2          # SOMAMOS S11 A T2 PARA SABER QUAL BYTE DO MAPA √Ø¬ø¬Ω, SE ELE FOR DO TIPO QUE COLIDE (TIJOLO OU METAL) RETORNA 0
+               add t4, t4, t2            # SOMAMOS S11 A T2 PARA SABER QUAL BYTE DO MAPA ÔøΩ, SE ELE FOR DO TIPO QUE COLIDE (TIJOLO OU METAL) RETORNA 0
                
                lb t3, 0(t4)
                
@@ -754,7 +854,16 @@ COLIDE_NORMAL: li t6, 16
                beq t3, t4, COLIDE
                
                li t4, 2
-               beq t3, t4, NOVO_ITEM
+               beq t3, t4, PORTA
+               
+               li t4, 3
+               beq t3, t4, CHAVE
+               
+               li t4, 4
+               beq t3, t4, BOLA_POWER_UP
+               
+               li t4, 5
+               beq t3, t4, ARMA_POWER_UP
                
                li s1, 0
                ret
@@ -762,22 +871,63 @@ COLIDE_NORMAL: li t6, 16
 COLIDE:        li s1, 1
                ret
                
-NOVO_ITEM:     addi s7, s7, 1
+BOLA_POWER_UP: li s7, 1
+               li s1, 0
+               ret
+               
+ARMA_FOGUETE:  li s7, 2
+               li s1, 0
+               ret
+               
+CHAVE:         li s8, 1
                li s1, 0
                ret
 
-#-------------------------------------------RESULTADO DA COLIS√ÉO--------------------------------------------------------------------------------------------------------
+PORTA:         beq s8, zero, COLIDE      # SE O JOGADOR N√O TIVER A CHAVE, SAMUS N√O PODER¡ PASSAR PELA PORTA
+
+PORTA_ABRE:    li s1, 0
+               li s8, 2
+               ret
+               
+ARMA_POWER_UP: li s7, 2
+               li s1, 0
+               ret
+
+#-------------------------------------------RESULTADO DA COLIS√O--------------------------------------------------------------------------------------------------------
 
 SAMUS_RESUL_COL:
-           bne s5, zero, FRAME_5         # SE O PERSONAGEM ESTIVER SUBINDO, SEU FRAME ATUAL SER√Å 5 (CAINDO/SUBINDO)
+           lh t0, 6(a3)
+	   beq t0, zero, RESUL_HUMANA
+	   
+RESUL_BOLA:
+           bne s5, zero, FRAME_7
+           
+           lh t0, 6(a4)
+           beq t0, zero, FRAME_7         # SE O PERSONAGEM ESTIVER CAINDO, SEU SPRITE N√O PODE MUDAR
+           
+           lh t0, 4(a4)                  # CARREGA O FRAME ATUAL
+           
+           li t1, 10
+	   beq t0, t1, FRAME_7
+	   
+	   addi t0, t0, 1
+	   sh t0, 4(a4)
+	   j ATUALIZA_POS
+
+FRAME_7:   li t0, 7
+           sh t0, 4(a4)
+           j ATUALIZA_POS
+
+RESUL_HUMANA:           
+           bne s5, zero, FRAME_5         # SE O PERSONAGEM ESTIVER SUBINDO, SEU FRAME ATUAL SER¡ 5 (CAINDO/SUBINDO)
 	   
 	   lh t0, 6(a4)
-	   beq t0, zero, FRAME_5         # SE O PERSONAGEM ESTIVER CAINDO, SEU SPRITE N√ÉO PODE MUDAR
+	   beq t0, zero, FRAME_5         # SE O PERSONAGEM ESTIVER CAINDO, SEU SPRITE N√O PODE MUDAR
 	   
 	   lh t0, 4(a4)                  # CARREGA O FRAME ATUAL
            
            li t1, 4
-	   beq t0, t1, VOLTA_FRAME_1
+	   beq t0, t1, FRAME_1
 	   
 	   addi t0, t0, 1
 	   sh t0, 4(a4)
@@ -787,13 +937,13 @@ SAMUS_RESUL_COL:
 FRAME_5:   li t0, 5                      # SETA O FRAME 4 COMO FRAME ATUAL (samus_pulando, no caso da Samus)
      	   sh t0, 4(a4)
      	   j ATUALIZA_POS
- 
+     	   
           #---------------------------------------------------------------------------------------------------------------------------------------------------
 
 ENTIDADE_RESUL_COL:
            lh t0, 6(a3) 
 	   li t1, 3
-	   beq t0, t1, ATUALIZA_POS      # SE A ENTIDADE QUE SE MOVEU FOPR UM PROJ√âTIL, ELE PULA TODO O PROCESSOD DE ATUALIZAR O FRAME DE ANIMA√á√ÉO
+	   beq t0, t1, ATUALIZA_POS      # SE A ENTIDADE QUE SE MOVEU FOPR UM PROJ…TIL, ELE PULA TODO O PROCESSOD DE ATUALIZAR O FRAME DE ANIMA«√O
 	   
 	   li t1, 1
 	   beq t0, t1, RESUL_SCORPIO
@@ -815,26 +965,26 @@ RESUL_SCORPIO:
 	   lh t0, 4(a4)                  # CARREGA O FRAME ATUAL
 	  
 	   li t1, 4
-	   beq t0, t1, VOLTA_FRAME_1
+	   beq t0, t1, FRAME_1
 	   
 	   addi t0, t0, 1
 	   sh t0, 4(a4)
 	   j ATUALIZA_POS
 
-VOLTA_FRAME_1:
+FRAME_1:
            li t0, 1
            sh t0, 4(a4)
            
            #---------------------------------------------------------------------------------------------------------------------------------------------------
            
 ATUALIZA_POS:           
-           lw t3, 0(a3)                  # COMO O PERSONAGEM N√ÉO IR√Å COLIDIR, PODEMOS ATUALIZAR CHAR_POS E OLD_CHAR_POS 
+           lw t3, 0(a3)                  # COMO O PERSONAGEM N√O IR¡ COLIDIR, PODEMOS ATUALIZAR CHAR_POS E OLD_CHAR_POS 
            sw t3, 0(a4)                  # AGORA OLD_CHAR_POS PASSA A SER CHAR_POS
            
-           lw t3, 0(a5)                  # COMO O PERSONAGEM N√ÉO IR√Å COLIDIR, PODEMOS ATUALIZAR CHAR_POS E NEXT_CHAR_POS 
+           lw t3, 0(a5)                  # COMO O PERSONAGEM N√O IR¡ COLIDIR, PODEMOS ATUALIZAR CHAR_POS E NEXT_CHAR_POS 
            sw t3, 0(a3)                  # AGORA CHAR_POS PASSA A SER NEXT_CHAR_POS
 
-#---------------------------------------------------APAGA A POSI√á√ÉO ANTIGA DA ENTIDADE--------------------------------------------
+#---------------------------------------------------APAGA A POSI«√O ANTIGA DA ENTIDADE--------------------------------------------
 	   
 OLD_POS:    lh t0, 6(a3)                 # PEGA O TIPO DA ENTIDADE
                
@@ -849,13 +999,13 @@ OLD_POS:    lh t0, 6(a3)                 # PEGA O TIPO DA ENTIDADE
             li t1, 3
             beq t0, t1, T4_PIXELS        # SE FOR UM PROJETIL, APAGA COM O OLD_POS DE 4 X 4
        
-T32_PIXELS: la a0, old_char_pos          # Apaga a posi√ß√£o antiga da SAMUS no frame que vai ser escondido (32 x 16)
+T32_PIXELS: la a0, old_char_pos          # Apaga a posiÁ„o antiga da SAMUS no frame que vai ser escondido (32 x 16)
             j APAGA
 
-T16_PIXELS: la a0, half_old_char_pos     # Apaga a posi√ß√£o antiga de INIMIGOS no frame que vai ser escondido (16 x 16)
+T16_PIXELS: la a0, half_old_char_pos     # Apaga a posiÁ„o antiga de INIMIGOS no frame que vai ser escondido (16 x 16)
             j APAGA
             
-T4_PIXELS:  la a0, projetil_old_pos      # Apaga a posi√ß√£o antiga de PROJ√âTEIS no frame que vai ser escondido (4 x 4)
+T4_PIXELS:  la a0, projetil_old_pos      # Apaga a posiÁ„o antiga de PROJ…TEIS no frame que vai ser escondido (4 x 4)
 
 APAGA: 	    lh a1, 0(a4)
  	    lh a2, 2(a4)
@@ -874,9 +1024,6 @@ APAGA: 	    lh a1, 0(a4)
             call PRINT
             lw ra, 0(sp)                 # Restaura ra da pilha
             addi sp, sp, 4               # Ajusta a pilha de volta
-            
-            #li a7, 5
-            #ecall
            
             ret
                
@@ -888,7 +1035,7 @@ CHAR_RET:   lw t3, 0(a3)                 # CORRIGE NEXT_CHAR_POS PARA O CASO EM 
 
 IA_ENTIDADES:  mv a6, s3
                
-               j SAMUS_TURN              # SAMUS SEMPRE SER√Å A PRIMEIRA DA LISTA, ENT√ÉO ELA INICIA O LOOP
+               j SAMUS_TURN              # SAMUS SEMPRE SER¡ A PRIMEIRA DA LISTA, ENT√O ELA INICIA O LOOP
           
 ENTIDADES_LOOP:beq a6, s4, FINAL_LOOP    # QUANDO CHEGA NO FIM DA LISTA, ENCERRA O LOOP
                addi a6, a6, 24
@@ -896,13 +1043,13 @@ ENTIDADES_LOOP:beq a6, s4, FINAL_LOOP    # QUANDO CHEGA NO FIM DA LISTA, ENCERRA
                #li a7, 5
                #ecall
                
-               lh t1, 0(s3)              # X e Y Samus
+               lh t1, 0(s3)               # X e Y Samus
 	       lh t2, 2(s3)
               
-               lh t3, 4(a6)              # VIDA DA ENTIDADE
+               lh t3, 4(a6)               # VIDA DA ENTIDADE
 	       beq t3, zero, FIM_DO_TURNO # se o inimigo estiver morto, nada acontece
 	       
-	       lh t3, 6(a6)              # carrega o tipo da entidade
+	       lh t3, 6(a6)               # carrega o tipo da entidade
 	       
 	       li t4, 1
 	       beq t3, t4, SCORPIO_TURN
@@ -921,12 +1068,12 @@ ENTIDADES_LOOP:beq a6, s4, FINAL_LOOP    # QUANDO CHEGA NO FIM DA LISTA, ENCERRA
 	       #beq t4, t5, PINWHEEL_TURN
 	       
 #--------------------------------------------------------------------------------------------------------------------------------------
-# PULA PARA O FIM POIS A SAMUS N√ÉO TEM IA, OU SEJA, DIRETO PARA A FASE DE PRINT
+# PULA PARA O FIM POIS A SAMUS N√O TEM IA, OU SEJA, DIRETO PARA A FASE DE PRINT
 SAMUS_TURN:    addi sp, sp, -4             # Ajusta a pilha para salvar ra
     	       sw ra, 0(sp)                # Salva ra na pilha
-    	       mv a3, s3                   # SALVA EM A3 A POSI√Ø¬ø¬Ω√Ø¬ø¬ΩO X, Y DA SAMUS E OS ATRIBUTOS DE ENTIDADES_INFO (VIDA E TIPO)
-     	       addi a4, a3, 8              # SALVA EM A4 A POSI√Ø¬ø¬Ω√Ø¬ø¬ΩO ANTIGA DA SAMUS E OS ATRIBUTOS DE OLD_ENTIDADES_INFO (FRAME ATUAL E FRAME ANTIGO)
-     	       addi a5, a4, 8              # SALVA EM A5 A PR√Ø¬ø¬ΩXIMA POSI√Ø¬ø¬Ω√Ø¬ø¬ΩO X DA SAMUS E OS ATRIBUTOS DE NEXT_ENTIDADES_INFO (CIMA/BAIXO E ESQUERDA/DIRETIA)
+    	       mv a3, s3                   # SALVA EM A3 A POSIÔøΩÔøΩO X, Y DA SAMUS E OS ATRIBUTOS DE ENTIDADES_INFO (VIDA E TIPO)
+     	       addi a4, a3, 8              # SALVA EM A4 A POSIÔøΩÔøΩO ANTIGA DA SAMUS E OS ATRIBUTOS DE OLD_ENTIDADES_INFO (FRAME ATUAL E FRAME ANTIGO)
+     	       addi a5, a4, 8              # SALVA EM A5 A PRÔøΩXIMA POSIÔøΩÔøΩO X DA SAMUS E OS ATRIBUTOS DE NEXT_ENTIDADES_INFO (CIMA/BAIXO E ESQUERDA/DIRETIA)
                call KEY
                lw ra, 0(sp)                # Restaura ra da pilhad
                addi sp, sp, 4              # Ajusta a pilha de volta
@@ -937,7 +1084,7 @@ SAMUS_TURN:    addi sp, sp, -4             # Ajusta a pilha para salvar ra
     	       sw ra, 0(sp)                # Salva ra na pilha
     	       mv a3, s3
     	       addi a4, a3, 8
-    	       addi a5, a4, 8              # C√ìDIGO QUE FAZ COM QUE A SAMUS PULE
+    	       addi a5, a4, 8              # C”DIGO QUE FAZ COM QUE A SAMUS PULE
                call CHAR_SOBE
                lw ra, 0(sp)                # Restaura ra da pilhad
                addi sp, sp, 4              # Ajusta a pilha de volta
@@ -960,35 +1107,35 @@ GRAVIDADE_NAO_AFETA_SAMUS:
                la a0, samus_parada         # PEGA O FRAME BASE DA SAMUS
 	   
 	       lh t1, 12(s3)               # FRAME ATUAL DA SAMUS
-	       li t2, 520                  # CADA SPRITE DA SAMUS POSSUI 520 BYTES E EST√ÉO ORGANIZADOS EM ORDEM
+	       li t2, 520                  # CADA SPRITE DA SAMUS POSSUI 520 BYTES E EST√O ORGANIZADOS EM ORDEM
 	       mul t1, t1, t2              
 	   
-	       add a0, a0, t1	           # N¬∞ SPRITE ATUAL X 520 + SPRITE BASE = ENDERE√áO DO SPRITE QUE QUEREMOS IMPRIMIR  
- 	       lh a1, 0(s3)                # Imprime a posi√ß√£o X do personagem
- 	       lh a2, 2(s3)                # Imprime a posi√ß√£o Y do personagem
+	       add a0, a0, t1	           # N∞ SPRITE ATUAL X 520 + SPRITE BASE = ENDERE«O DO SPRITE QUE QUEREMOS IMPRIMIR  
+ 	       lh a1, 0(s3)                # Imprime a posiÁ„o X do personagem
+ 	       lh a2, 2(s3)                # Imprime a posiÁ„o Y do personagem
  	       mv a7, s0
  	       
  	       j PRINT_TURN
 	       
 #--------------------------------------------------------------------------------------------------------------------------------------
-# Descreve o comportamento do tipo de inimigo ESCORPI√ÉO
-SCORPIO_TURN:  lh a1, 0(a3)              # salva a posi√ß√£o X do Inimigo
-	       lh a2, 2(a3)              # salva a posi√ß√£o Y do Inimigo
+# Descreve o comportamento do tipo de inimigo ESCORPI√O
+SCORPIO_TURN:  lh a1, 0(a3)              # salva a posiÁ„o X do Inimigo
+	       lh a2, 2(a3)              # salva a posiÁ„o Y do Inimigo
 	       
-	       addi t3, t1, 15                # AGORA EM T1 EST√Å O PRIMEIRO BIT HORIZONTAL DA SAMUS E EM T3 O √öLTIMO BIT HORIZONTAL DA SAMUS
-	       addi t4, t2, 31                # AGORA EM T2 EST√Å O PRIMEIRO BIT VERTICAL   DA SAMUS E EM T4 O √öLTIMO BIT VERTICAL   DA SAMUS
+	       addi t3, t1, 15                # AGORA EM T1 EST¡ O PRIMEIRO BIT HORIZONTAL DA SAMUS E EM T3 O ⁄LTIMO BIT HORIZONTAL DA SAMUS
+	       addi t4, t2, 31                # AGORA EM T2 EST¡ O PRIMEIRO BIT VERTICAL   DA SAMUS E EM T4 O ⁄LTIMO BIT VERTICAL   DA SAMUS
 	       
-	       slt t6, a1, t3                 # VERIFICA SE SCORPIO_X √â MENOR QUE O BIT HORIZONTAL DA DIREITA DA SAMUS
-	       slt a5, t1, a1                 # VERIFICA SE O BIT HORIZONTAL DA ESQUERDA DA SAMUS √â MENOR QUE PROJ_X
+	       slt t6, a1, t3                 # VERIFICA SE SCORPIO_X … MENOR QUE O BIT HORIZONTAL DA DIREITA DA SAMUS
+	       slt a5, t1, a1                 # VERIFICA SE O BIT HORIZONTAL DA ESQUERDA DA SAMUS … MENOR QUE PROJ_X
 	       
-	       and a4, t6, a5                 # VERIFICA SE O PROJ√âTIL EST√Å DENTRO DA SAMUS NA HORIZONTAL
+	       and a4, t6, a5                 # VERIFICA SE O PROJ…TIL EST¡ DENTRO DA SAMUS NA HORIZONTAL
 	       
-	       slt t6, a2, t4                 # VERIFICA SE PROJ_Y √â MENOR QUE O BIT VERTICAL DE BAIXO DA SAMUS
-	       slt a5, t2, a2                 # VERIFICA SE O BIT VERTICAL DE CIMA DA SAMUS √â MENOR QUE PROJ_Y
+	       slt t6, a2, t4                 # VERIFICA SE PROJ_Y … MENOR QUE O BIT VERTICAL DE BAIXO DA SAMUS
+	       slt a5, t2, a2                 # VERIFICA SE O BIT VERTICAL DE CIMA DA SAMUS … MENOR QUE PROJ_Y
 	       
-	       and a5, t6, a5                 # VERIFICA SE O PROJ√âTIL EST√Å DENTRO DA SAMUS NA VERTICAL
+	       and a5, t6, a5                 # VERIFICA SE O PROJ…TIL EST¡ DENTRO DA SAMUS NA VERTICAL
 	       
-	       and s1, a4, a5                 # VERIFICA SE O PROJ√âTIL EST√Å AO MESMO TEMPO DENTRO DA SAMUS VERTICALMENTE E HORIZONTALMENTE
+	       and s1, a4, a5                 # VERIFICA SE O PROJ…TIL EST¡ AO MESMO TEMPO DENTRO DA SAMUS VERTICALMENTE E HORIZONTALMENTE
 	       
 	       li t1, 1
 	       beq s1, t1, PROJETIL_ATAK
@@ -999,30 +1146,30 @@ SCORPIO_TURN:  lh a1, 0(a3)              # salva a posi√ß√£o X do Inimigo
 	       
 	       
 	       sub t3, a2, t2
-	       addi t3, t3, 16           # A POSI√á√ÉO Y DA SAMUS √â A DA CABE√áA A DELA, QUE TEM 32 PIXELS, PARA COMPARAR COM O Y DO ESCORPI√ÉO PRECISAMOS SOMAR 16
+	       addi t3, t3, 16           # A POSI«√O Y DA SAMUS … A DA CABE«A A DELA, QUE TEM 32 PIXELS, PARA COMPARAR COM O Y DO ESCORPI√O PRECISAMOS SOMAR 16
 	       
 	       sub t4, a1, t1
 	       
 	       and t5, t4, t3
 	       beq t5, zero, SAMUS_DANO
 	     
-	       # Fazer um AND entre "est√° na mesma cordenada Y" e "Estar dentro do INTERVALO DE ATAQUE do inimigo"
+	       # Fazer um AND entre "est· na mesma cordenada Y" e "Estar dentro do INTERVALO DE ATAQUE do inimigo"
 	      
-	       #----------------------------------------COMPARA A POSI√á√ÉO Y DA SAMUS E DO ESCORPI√ÉO----------------------------------------------------------
+	       #----------------------------------------COMPARA A POSI«√O Y DA SAMUS E DO ESCORPI√O----------------------------------------------------------
 	       
-	       bne t3, zero, SCORPIO_ANDA     # CASO A SAMUS E O ESCORPI√ÉO N√ÉO ESTEJAM NO MESMO ANDAR, O ESCORPI√ÉO APENAS ANDA
+	       bne t3, zero, SCORPIO_ANDA     # CASO A SAMUS E O ESCORPI√O N√O ESTEJAM NO MESMO ANDAR, O ESCORPI√O APENAS ANDA
 	       
 	       xori t0, t3, 1
 	     
-	       #-----------------------------------------COMPARA A POSI√á√ÉOO X DA SAMUS E DO ESCORPI√ÉO--------------------------------------------------------
+	       #-----------------------------------------COMPARA A POSI«√OO X DA SAMUS E DO ESCORPI√O--------------------------------------------------------
                
-      	       addi t3, a1, -32               # verifica se o personagem est√° 3 tiles na frente do inimigo
-	       addi t4, a1, 32                # verifica se o personagem est√° 2 tiles atr√°s do inimigo
+      	       addi t3, a1, -32               # verifica se o personagem est· 3 tiles na frente do inimigo
+	       addi t4, a1, 32                # verifica se o personagem est· 2 tiles atr·s do inimigo
 	     
-	       slt t5, t1, t4                 # T1 TEM que ser menor que T4 para que o inimigo ataque (SAMUS EST√Ø¬ø¬Ω DENTRO DO CAMPO DE VIS√Ø¬ø¬ΩO DA DIREITA DO INIMIGO)
-	       slt t6, t3, t1                 # T3 TEM que ser maior que T3 para que o inimigo ataque (SAMUS EST√Ø¬ø¬Ω DENTRO DO CAMPO DE VIS√Ø¬ø¬ΩO DA ESQUERDA DO INIMIGO)
+	       slt t5, t1, t4                 # T1 TEM que ser menor que T4 para que o inimigo ataque (SAMUS ESTÔøΩ DENTRO DO CAMPO DE VISÔøΩO DA DIREITA DO INIMIGO)
+	       slt t6, t3, t1                 # T3 TEM que ser maior que T3 para que o inimigo ataque (SAMUS ESTÔøΩ DENTRO DO CAMPO DE VISÔøΩO DA ESQUERDA DO INIMIGO)
 	     
-	       #----------------------------TABELA VERDADE DO ESCORPI√Ø¬ø¬ΩO ATACAR------------------------------
+	       #----------------------------TABELA VERDADE DO ESCORPIÔøΩO ATACAR------------------------------
 	       #
 	       #        T5      T6          T2 (ATACAR)  |      T1    T2      ATACAR
 	       #        0       0           0            |      0     0         0
@@ -1030,13 +1177,13 @@ SCORPIO_TURN:  lh a1, 0(a3)              # salva a posi√ß√£o X do Inimigo
 	       #        1       0           0            |      1     0         0
 	       #        1       1           1            |      1     1         1
 	     
-	       and t4, t6, t5                 # VERIFICA SE O SAMUS EST√Å NO RANGE DE ATAQUE DO INIMIGO
+	       and t4, t6, t5                 # VERIFICA SE O SAMUS EST¡ NO RANGE DE ATAQUE DO INIMIGO
 	     
 	       #------------------------------------------------------------------------------------------------------------
-	       and t5, t4, t0                 # VERIFICA SE A SAMUS EST√Å NO RANGE DE ATAQUE DO INIMIGO E NA MESMA ALTURA. 
+	       and t5, t4, t0                 # VERIFICA SE A SAMUS EST¡ NO RANGE DE ATAQUE DO INIMIGO E NA MESMA ALTURA. 
 	       
 	       li t4, 1                     
-	       beq t5, t4, SCORPIO_ATACK      # VERIFICA SE O ESCORPI√ÉO IR√Å ATACAR A SAMUS OU N√ÉO
+	       beq t5, t4, SCORPIO_ATACK      # VERIFICA SE O ESCORPI√O IR¡ ATACAR A SAMUS OU N√O
 	       j SCORPIO_ANDA
 	     
 SCORPIO_ATACK: slt t6, t1, a1
@@ -1070,7 +1217,7 @@ ATIRA:         addi sp, sp, -4                # Ajusta a pilha para salvar ra
                
 SCORPIO_ANDA:  addi a5, a6, 16
 
-               sh t0, 4(a5)                   # VERIFICA SE EST√Å INDO PARA A ESQUERDA OU DIREITA
+               sh t0, 4(a5)                   # VERIFICA SE EST¡ INDO PARA A ESQUERDA OU DIREITA
                
                beq t0, zero, SCORPIO_ESQ
                
@@ -1119,13 +1266,13 @@ SCORPIO_GRAVIDADE:
                
                la a0, escorpiao_atirando
                
-               lh t1, 12(a6)                  # frame atual do Escorpi√£o
+               lh t1, 12(a6)                  # frame atual do Escorpi„o
 	       li t2, 264
 	       mul t1, t1, t2 
 	                      
-	       add a0, a0, t1	              # N¬∞ SPRITE ATUAL X 264 + SPRITE BASE = ENDERE√áO DO SPRITE QUE QUEREMOS IMPRIMIR   
- 	       lh a1, 0(a6)                   # Imprime na posi√ß√£o X do personagem
- 	       lh a2, 2(a6)                   # Imprime na posi√ß√£o Y do personagem
+	       add a0, a0, t1	              # N∞ SPRITE ATUAL X 264 + SPRITE BASE = ENDERE«O DO SPRITE QUE QUEREMOS IMPRIMIR   
+ 	       lh a1, 0(a6)                   # Imprime na posiÁ„o X do personagem
+ 	       lh a2, 2(a6)                   # Imprime na posiÁ„o Y do personagem
  	       mv a7, s0
  	       
  	       j PRINT_TURN
@@ -1139,34 +1286,34 @@ VOADOR_ATACK:
 
 VOADOR_VOA:
 #--------------------------------------------------------------------------------------------------------------------------------------
-# DESCREVE O COMPORTAMENTO DE UM PROJ√âTIL
-PROJETIL_TURN: lh a1, 0(a3)                   # salva a posi√ß√£o X do Proj√©til
-	       lh a2, 2(a3)                   # salva a posi√ß√£o Y do Proj√©til
+# DESCREVE O COMPORTAMENTO DE UM PROJ…TIL
+PROJETIL_TURN: lh a1, 0(a3)                   # salva a posiÁ„o X do ProjÈtil
+	       lh a2, 2(a3)                   # salva a posiÁ„o Y do ProjÈtil
 	       
-	       addi t3, t1, 15                # AGORA EM T1 EST√Å O PRIMEIRO BIT HORIZONTAL DA SAMUS E EM T3 O √öLTIMO BIT HORIZONTAL DA SAMUS
-	       addi t4, t2, 31                # AGORA EM T2 EST√Å O PRIMEIRO BIT VERTICAL   DA SAMUS E EM T4 O √öLTIMO BIT VERTICAL   DA SAMUS
+	       addi t3, t1, 15                # AGORA EM T1 EST¡ O PRIMEIRO BIT HORIZONTAL DA SAMUS E EM T3 O ⁄LTIMO BIT HORIZONTAL DA SAMUS
+	       addi t4, t2, 31                # AGORA EM T2 EST¡ O PRIMEIRO BIT VERTICAL   DA SAMUS E EM T4 O ⁄LTIMO BIT VERTICAL   DA SAMUS
 	       
-	       slt t6, a1, t3                 # VERIFICA SE PROJ_X √â MENOR QUE O BIT HORIZONTAL DA DIREITA DA SAMUS
-	       slt a5, t1, a1                 # VERIFICA SE O BIT HORIZONTAL DA ESQUERDA DA SAMUS √â MENOR QUE PROJ_X
+	       slt t6, a1, t3                 # VERIFICA SE PROJ_X … MENOR QUE O BIT HORIZONTAL DA DIREITA DA SAMUS
+	       slt a5, t1, a1                 # VERIFICA SE O BIT HORIZONTAL DA ESQUERDA DA SAMUS … MENOR QUE PROJ_X
 	       
-	       and a4, t6, a5                 # VERIFICA SE O PROJ√âTIL EST√Å DENTRO DA SAMUS NA HORIZONTAL
+	       and a4, t6, a5                 # VERIFICA SE O PROJ…TIL EST¡ DENTRO DA SAMUS NA HORIZONTAL
 	       
-	       slt t6, a2, t4                 # VERIFICA SE PROJ_Y √â MENOR QUE O BIT VERTICAL DE BAIXO DA SAMUS
-	       slt a5, t2, a2                 # VERIFICA SE O BIT VERTICAL DE CIMA DA SAMUS √â MENOR QUE PROJ_Y
+	       slt t6, a2, t4                 # VERIFICA SE PROJ_Y … MENOR QUE O BIT VERTICAL DE BAIXO DA SAMUS
+	       slt a5, t2, a2                 # VERIFICA SE O BIT VERTICAL DE CIMA DA SAMUS … MENOR QUE PROJ_Y
 	       
-	       and a5, t6, a5                 # VERIFICA SE O PROJ√âTIL EST√Å DENTRO DA SAMUS NA VERTICAL
+	       and a5, t6, a5                 # VERIFICA SE O PROJ…TIL EST¡ DENTRO DA SAMUS NA VERTICAL
 	       
-	       and s1, a4, a5                 # VERIFICA SE O PROJ√âTIL EST√Å AO MESMO TEMPO DENTRO DA SAMUS VERTICALMENTE E HORIZONTALMENTE
+	       and s1, a4, a5                 # VERIFICA SE O PROJ…TIL EST¡ AO MESMO TEMPO DENTRO DA SAMUS VERTICALMENTE E HORIZONTALMENTE
 	       
 	       li t1, 1
 	       beq s1, t1, PROJETIL_ATAK
 	       j PROJETIL_ANDA
 	       
-PROJETIL_ATAK: sh zero, 4(a6)                 # MUDA A VIDA DO PROJ√âTIL PARA ZERO E APAGA O PROJETIL
+PROJETIL_ATAK: sh zero, 4(a6)                 # MUDA A VIDA DO PROJ…TIL PARA ZERO E APAGA O PROJETIL
                j SAMUS_DANO                   # PULA PARA A SAMUS TOMANDO O DANO
 
 PROJETIL_ANDA: addi a5, a6, 16
-               lh t1, 4(a5)                   # VERIFICA SE O PROJ√âTIL EST√Å INDO PARA A ESQUERDA OU PARA A DIREITA
+               lh t1, 4(a5)                   # VERIFICA SE O PROJ…TIL EST¡ INDO PARA A ESQUERDA OU PARA A DIREITA
                beq t1, zero, PROJETIL_ESQ
                j PROJETIL_DIR
 
@@ -1182,8 +1329,8 @@ PROJETIL_DIR:  addi sp, sp, -4                # Ajusta a pilha para salvar ra
                bne s1, zero, PROJETIL_MORRE
                
                la a0, projetil
-               lh a1, 0(a6)                  # Imprime a posi√ß√£o X do personagem
- 	       lh a2, 2(a6)                  # Imprime a posi√ß√£o Y do personagem
+               lh a1, 0(a6)                  # Imprime a posiÁ„o X do personagem
+ 	       lh a2, 2(a6)                  # Imprime a posiÁ„o Y do personagem
  	       mv a7, s0
                j PRINT_TURN
                
@@ -1199,8 +1346,8 @@ PROJETIL_ESQ:  addi sp, sp, -4               # Ajusta a pilha para salvar ra
                bne s1, zero, PROJETIL_MORRE
                
                la a0, projetil
-               lh a1, 0(a6)                   # Imprime a posi√ß√£o X do personagem
- 	       lh a2, 2(a6)                   # Imprime a posi√ß√£o Y do personagem
+               lh a1, 0(a6)                   # Imprime a posiÁ„o X do personagem
+ 	       lh a2, 2(a6)                   # Imprime a posiÁ„o Y do personagem
  	       mv a7, s0
                j PRINT_TURN
                
@@ -1218,7 +1365,7 @@ PROJETIL_MORRE:
               j FIM_DO_TURNO
               
 #-------------------------------------------------------------------------------------------------------------------------------------
-# FASE FINAL DO TURNO DE CADA ENTIDADE, ONDE √â PRINTADA A SUA POSI√á√ÉO
+# FASE FINAL DO TURNO DE CADA ENTIDADE, ONDE … PRINTADA A SUA POSI«√O
 
 PRINT_TURN:    #addi sp, sp, -4                # Ajusta a pilha para salvar ra
     	       #sw ra, 0(sp)                   # Salva ra na pilha
@@ -1231,14 +1378,14 @@ PRINT_TURN:    #addi sp, sp, -4                # Ajusta a pilha para salvar ra
                #li a7, 5
                #ecall
                
-               lh t0, 4(a5)                   # VALOR QUE INDICa PARA QUAL DIRE√á√ÉO O PERSONAGEM EST√Å INDO     
+               lh t0, 4(a5)                   # VALOR QUE INDICa PARA QUAL DIRE«√O O PERSONAGEM EST¡ INDO     
                beq t0, zero, PRINT_ESQ
                j PRINT_DIR
                
 PRINT_ESQ:     addi sp, sp, -4                # Ajusta a pilha para salvar ra
     	       sw ra, 0(sp)                   # Salva ra na pilha
                call PRINT
-               # A FUN√á√ÉO PRINT_ESQ AINDA N√ÉO EXISTE, ENT√ÉO ESTOU CHAMANDO A FUN√á√ÉO DE IMPRIMIR NORMAL
+               # A FUN«√O PRINT_ESQ AINDA N√O EXISTE, ENT√O ESTOU CHAMANDO A FUN«√O DE IMPRIMIR NORMAL
                lw ra, 0(sp)                   # Restaura ra da pilha
                addi sp, sp, 4                 # Ajusta a pilha de volta
                
@@ -1255,8 +1402,14 @@ PRINT_DIR:     addi sp, sp, -4                # Ajusta a pilha para salvar ra
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 SAMUS_DANO:    lh t0, 4(s3)
-               addi t0, t0, -1
+               addi t0, t0, -1                # DIMINUI UM DA VIDA DA SAMUS
                sh t0, 4(s3)
+               
+               li s7, 0                       # QUANDO A SAMUS LEVA DANO, ELA PERDE QUALQUER ITEM QUE ELA ESTIVER PERGUNTANDO
+               
+               #sh zero, 6(s3)                # QUANDO A SAMUS TOMA DANO ELE SAI DO MODO DE BOLA E VOLTA PARA O MODO HUMANA
+               #sh zero, 12(s3)               # QUANDO A SAMUS TOMA DANO ELA VOLTA PARA O FRAME_1
+               
                j FIM_DO_TURNO
 
 FIM_DO_TURNO:  j ENTIDADES_LOOP
@@ -1265,10 +1418,10 @@ FINAL_LOOP:    ret
 		    
 #---------------------------------------------------------------LINKED LIST--------------------------------------------------------------------------
 ADD_ITEM:
-    # SE O √çNDICE DO ITEM FOR 25, SIGNIFICA QUE A LISTA EST√Å CHEIA
+    # SE O ÕNDICE DO ITEM FOR 25, SIGNIFICA QUE A LISTA EST¡ CHEIA
     
-    addi t6, s4, -24       # CALCULA O ENDERE√áO DO √öLTIMO ITEM
-    lh t5, 22(t6)          # CARREGA O √çNDICE DO ELEMENTO ANTERIOR
+    addi t6, s4, -24       # CALCULA O ENDERE«O DO ⁄LTIMO ITEM
+    lh t5, 22(t6)          # CARREGA O ÕNDICE DO ELEMENTO ANTERIOR
     
     li t4, 25
     beq t5, t4, LISTA_CHEIA
@@ -1278,22 +1431,22 @@ ADD_ITEM:
     j ADD_ENTIDADE         
 
 ADD_ENTIDADE:
-    # Carregar endere√Ø¬ø¬Ωo atual para adicionar na lista `entidades_info`
-    sh a1, 0(t0)           # Salvar posi√ß√£o x
-    sh a2, 2(t0)           # Salvar posi√ß√£o y
+    # Carregar endereÔøΩo atual para adicionar na lista `entidades_info`
+    sh a1, 0(t0)           # Salvar posiÁ„o x
+    sh a2, 2(t0)           # Salvar posiÁ„o y
     sh a3, 4(t0)           # Salva a vida da Entidade
     sh a4, 6(t0)           # Salva o tipo da Entidade
     
-    sh a1, 8(t0)           # Salvar old_posi√ß√£o_x
-    sh a2, 10(t0)          # Salvar old_posi√ß√£o_y
+    sh a1, 8(t0)           # Salvar old_posiÁ„o_x
+    sh a2, 10(t0)          # Salvar old_posiÁ„o_y
     sh zero, 12(t0)        # salva o frame atual 
     li t1, 1
     sh t1, 14(t0)          # salva BAIXO/PARADO/CIMA
     
-    sh a1, 16(t0)          # Salvar next_posi√ß√£o_x
-    sh a2, 18(t0)          # Salvar next_posi√ß√£o_y
+    sh a1, 16(t0)          # Salvar next_posiÁ„o_x
+    sh a2, 18(t0)          # Salvar next_posiÁ„o_y
     sh a5, 20(t0)          # Salva esquerda/direita
-    sh t5, 22(t0)          # Salva o √≠ndice
+    sh t5, 22(t0)          # Salva o Ìndice
     
     addi s4, s4, 24
     ret
@@ -1323,15 +1476,15 @@ SEM_ESPACOS_LIVRES:
    ret
 #----------------------------------------------------------------PRINT--------------------------------------------------------------------------------
 
-# a0 = endere√ßo imagem
+# a0 = endereÁo imagem
 # a1 = x (coluna)
 # a2 = y (linha)
 # a3 = frame (0 ou 1)
 #
 ##
 #
-# t0 = endere√ßo do bitmap display
-# t1 = endere√ßo da imagem
+# t0 = endereÁo do bitmap display
+# t1 = endereÁo da imagem
 # t2 = contador de linha
 # t3 = contador de coluna
 # t4 = largura
@@ -1399,12 +1552,12 @@ PRINT_TILE:
     ret
 
 PRINT_MAP:
-    # Calcular a posi√Ø¬ø¬Ω√Ø¬ø¬Ωo x e y com base nos √Ø¬ø¬Ωndices de linha e coluna
+    # Calcular a posiÔøΩÔøΩo x e y com base nos ÔøΩndices de linha e coluna
     li t6, 16
     mul a1, s2, t6              # X = coluna DO MAPA * 16
     mul a2, s1, t6              # Y = linha DO MAPA * 16
     
-    la a0, tijolos
+    la a0, TIJOLOS
     lb t2, 0(s9)               # Carrega o byte atual do mapa 
     
     li t6, 7
@@ -1418,7 +1571,7 @@ PRINT_MAP:
     
     li t6, 264                  # CADA TILE DO MAPA TEM 256 BYTES (16 X 16 PIXELS, CADA PIXEL TEM 1 BYTE)
     mul t2, t2, t6
-    add a0, a0, t2              # O ENDERE√Ø¬ø¬ΩO DO TILE METAL EST√Ø¬ø¬Ω 256 BYTES DEPOIS DE TIJOLOS, ENT√Ø¬ø¬ΩO SE T2 = 1 => TIJOLOS + (1 x 256) = METAL
+    add a0, a0, t2              # O ENDEREÔøΩO DO TILE METAL ESTÔøΩ 256 BYTES DEPOIS DE TIJOLOS, ENTÔøΩO SE T2 = 1 => TIJOLOS + (1 x 256) = METAL
     
     addi sp, sp, -4             # Ajusta a pilha para salvar ra
     sw ra, 0(sp)                # Salva ra na pilha   
@@ -1429,7 +1582,7 @@ PRINT_MAP:
     j NEXT_PIXEL
     
 print_fundo:
-    la a0, fundo_preto
+    la a0, FUNDO_PRETO
     
     addi sp, sp, -4             # Ajusta a pilha para salvar ra
     sw ra, 0(sp)                # Salva ra na pilha   
@@ -1480,9 +1633,9 @@ ADD_ESCORPIAO:
     j NEXT_PIXEL
     
 NEXT_PIXEL:
-    # Avan√ßa para o pr√≥ximo pixel da linha (pr√≥xima coluna)
-    addi s9, s9, 1      # Avan√ßa para o pr√≥ximo byte do mapa
-    addi s2, s2, 1      # Pr√≥xima coluna
+    # AvanÁa para o prÛximo pixel da linha (prÛxima coluna)
+    addi s9, s9, 1      # AvanÁa para o prÛximo byte do mapa
+    addi s2, s2, 1      # PrÛxima coluna
     
     li t3, 20           # Total de colunas
     blt s2, t3, PRINT_MAP
@@ -1497,7 +1650,7 @@ NEXT_PIXEL:
     
     mv s2, zero
 
-    # Pr√≥xima linha
+    # PrÛxima linha
     addi s1, s1, 1
         
     li t3, 15         # Total de linhas (excluindo a primeira)
@@ -1506,17 +1659,15 @@ NEXT_PIXEL:
 .data
 #--------------------------------------------------LISTAS------------------------------------------------------------------------
 
-ENTIDADES_INFO: .half 16, 32, 5, 0,              # X = 32, Y = 32, Vida = 10, Tipo da entidade = 0       (CHAR_POS, VIDA, TIPO)
-                      16, 32, 0, 1,               # X = 32, Y = 32, Frame atual = 0, BAIXO (0) /PARADO (1) / CIMA (2) = 1    (OLD_CHAR_POS, FRAMES_ANIMA√á√ÉO)
-                      16, 32, 3, 1                # X = 32, Y = 32, ESQ (0)/ PARADO (1) /DIR (2) = 1, √çNDICE                   (NEXT_CHAR_POS, ESQ/DIR, √çNDICE)
+ENTIDADES_INFO: .half 20, 32, 5, 0,              # X = 32, Y = 32, Vida = 10, Tipo da entidade = 0       (CHAR_POS, VIDA, TIPO)
+                      20, 32, 0, 1,               # X = 32, Y = 32, Frame atual = 0, BAIXO (0) /PARADO (1) / CIMA (2) = 1    (OLD_CHAR_POS, FRAMES_ANIMA«√O)
+                      20, 32, 3, 1                # X = 32, Y = 32, ESQ (0)/ PARADO (1) /DIR (2) = 1, ÕNDICE                   (NEXT_CHAR_POS, ESQ/DIR, ÕNDICE)
                       
 		.space 576                        # Cada entidade tem 24 bytes, quero que a lista tenha 25 entidades
 
 #--------------------------------------------------TILES------------------------------------------------------------------------
-tijolo_coracao: .word 16, 16
-                .byte 
 
-tijolos: .word 16, 16
+TIJOLOS: .word 16, 16
          .byte 173,173,173,173,0,0,173,173,173,173,173,0,173,173,173,173,
                173,173,173,173,173,0,173,173,173,173,173,0,173,173,173,173,
                173,173,173,173,173,0,173,173,173,173,173,0,0,173,173,173,
@@ -1534,7 +1685,7 @@ tijolos: .word 16, 16
                173,173,173,0,0,173,173,173,173,0,173,173,173,173,0,173,
                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 
-metal: .word 16, 16
+METAL: .word 16, 16
        .byte 164,164,164,164,164,164,164,0,0,164,164,164,164,164,164,164,
              164,164,164,164,164,164,164,0,0,164,164,164,164,164,164,164,
              164,164,  0,164,  0,164,164,0,0,164,164,  0,164,  0,164,164,
@@ -1552,7 +1703,81 @@ metal: .word 16, 16
              164,164,164,164,164,164,164,0,0,164,164,164,164,164,164,164,
              164,164,164,164,164,164,164,0,0,164,164,164,164,164,164,164
              
-fundo_preto: .word 16, 16
+PORTA_VERMELHA: .word 16, 16
+		.byte 0,0,0,0,0,7,7,255,7,7,7,7,7,255,7,7,
+		0,0,0,0,0,7,7,255,7,7,7,7,7,255,7,7,
+		0,0,0,0,0,7,7,255,7,7,7,7,7,255,7,7,
+		0,0,0,0,0,7,7,255,7,7,7,7,6,255,6,6,
+		0,0,0,0,0,7,7,255,7,7,6,6,6,255,6,6,
+		0,0,0,0,0,7,7,255,7,6,6,6,6,255,6,6,
+		0,0,0,0,0,7,7,255,6,91,91,91,6,255,6,6,
+		0,0,0,0,0,7,7,255,6,91,91,91,6,255,6,6,
+		0,0,0,0,0,7,7,255,6,91,91,91,6,255,6,6,
+		0,0,0,0,0,7,7,255,6,91,91,91,6,255,6,6,
+		0,0,0,0,0,7,7,255,6,6,6,6,6,255,6,6,
+		0,0,0,0,0,7,7,255,6,6,6,6,6,255,6,6,
+		0,0,0,0,0,7,7,255,6,6,6,6,6,255,6,6,
+		0,0,0,0,0,7,7,255,6,6,6,6,6,255,6,6,
+		0,0,0,0,0,7,7,255,6,6,6,6,6,255,6,6,
+		0,0,0,0,0,7,7,255,7,6,6,6,6,255,6,6,
+
+CHAVE_VERMELHA: .word 16, 16
+		.byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,7,7,7,7,7,7,7,7,7,7,7,7,0,0,
+		0,0,7,0,0,0,0,0,0,0,0,0,0,7,0,0,
+		0,0,7,0,255,0,255,0,255,0,0,0,0,7,0,0,
+		0,0,7,0,255,0,255,0,255,0,0,91,91,7,0,0,
+		0,0,7,0,255,0,255,0,255,0,0,91,91,7,0,0,
+		0,0,7,7,7,7,7,7,7,7,7,7,7,7,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+
+ITEM_BOLA:      .word 16, 16
+		.byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,145,145,0,0,0,0,0,0,0,
+		0,0,0,0,0,145,145,240,63,145,145,0,0,0,0,0,
+		0,0,0,0,145,240,240,240,63,63,63,145,0,0,0,0,
+		0,0,0,145,240,240,240,240,63,63,63,63,145,0,0,0,
+		0,0,0,145,240,240,240,63,63,63,63,240,145,0,0,0,
+		0,0,0,145,240,240,63,63,63,63,240,240,145,0,0,0,
+		0,0,0,145,240,63,63,63,63,240,240,240,145,0,0,0,
+		0,0,0,145,63,63,63,63,240,240,240,240,145,0,0,0,
+		0,0,0,0,145,63,63,63,240,240,240,145,0,0,0,0,
+		0,0,0,0,0,145,145,63,240,145,145,0,0,0,0,0,
+		0,0,0,0,0,0,0,145,145,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+		
+ARMA: 		.word 16, 16
+		.byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,22,0,0,0,0,0,0,0,0,164,0,
+		0,0,0,73,22,22,22,22,22,22,22,22,22,164,164,0,
+		0,0,73,73,22,22,22,22,22,22,22,22,22,164,164,0,
+		0,73,73,73,22,22,22,22,22,22,22,22,22,164,164,0,
+		73,73,73,73,22,22,22,22,22,22,22,22,22,164,164,0,
+		73,73,73,73,0,0,0,73,0,0,0,0,0,0,164,0,
+		73,73,73,73,0,0,73,0,0,0,0,0,0,0,0,0,
+		73,73,73,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+
+
+
+FUNDO_PRETO: .word 16, 16
              .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -1571,36 +1796,36 @@ fundo_preto: .word 16, 16
              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 
-# PR√Ø¬ø¬ΩXIMO TILE,  QUE SER√Ø¬ø¬Ω IDENTIFICADO COMO 2
+# PRÔøΩXIMO TILE,  QUE SERÔøΩ IDENTIFICADO COMO 2
 
-# PR√Ø¬ø¬ΩXIMO TILE, QUE SER√Ø¬ø¬Ω IDENTIFICADO COMO 3
+# PRÔøΩXIMO TILE, QUE SERÔøΩ IDENTIFICADO COMO 3
 
 # ETC...
 
-# 7 √Ø¬ø¬Ω PARA VOADOR, N√Ø¬ø¬ΩO PODE SER TILE
-# 8 √Ø¬ø¬Ω PARA ESCORPI√Ø¬ø¬ΩO, N√Ø¬ø¬ΩO PODE SER TILE
-# 9 √Ø¬ø¬Ω VAZIO, N√Ø¬ø¬ΩO PODE SER TILE 
+# 7 ÔøΩ PARA VOADOR, NÔøΩO PODE SER TILE
+# 8 ÔøΩ PARA ESCORPIÔøΩO, NÔøΩO PODE SER TILE
+# 9 ÔøΩ VAZIO, NÔøΩO PODE SER TILE 
 
 #--------------------------------------------------MAPAS------------------------------------------------------------------------
 
-mapa_2: .word 60,
-        .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	      0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,9,9,9,9,9,9,9,9,8,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
-              0,0,0,0,0,0,0,0,0,0,9,9,0,9,9,9,9,9,0,0,9,0,0,0,0,0,0,0,0,9,9,9,0,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,
-              0,0,9,9,9,9,9,9,0,1,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,1,9,9,0,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,9,9,9,9,9,0,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,0,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,9,9,9,9,0,0,9,9,9,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,0,0,9,9,9,0,0,0,9,9,9,9,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,9,9,0,0,0,9,9,9,1,0,9,9,9,9,9,0,0,0,9,9,9,9,0,0,0,9,9,9,1,0,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,9,0,0,9,9,9,9,9,9,0,9,9,9,9,0,0,0,0,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,9,9,0,0,0,0,0,0,0,0,0,0,
-              0,9,9,0,0,9,9,9,9,9,9,9,0,9,9,9,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,0,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
-              0,9,9,9,9,9,9,9,9,9,1,9,9,9,9,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
-              0,1,9,9,9,9,9,9,9,1,1,9,9,9,1,0,0,0,0,0,0,0,0,1,9,9,9,9,9,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+mapa_1: .word 60,
+        .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,9,0,9,0,9,0,9,0,9,0,9,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	      0,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,9,9,9,9,9,9,9,9,9,9,8,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,9,9,9,4,9,9,9,9,9,9,1,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,0,0,0,0,0,0,0,0,9,9,9,0,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,0,9,9,9,9,9,9,0,1,9,9,0,5,9,9,9,9,9,0,9,9,1,1,1,1,0,0,0,0,0,9,9,9,9,9,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,9,9,9,9,9,9,9,0,9,9,9,0,1,9,9,9,9,9,2,9,9,9,9,9,9,1,0,0,0,0,0,9,9,9,9,9,9,4,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,9,9,9,9,9,9,3,0,9,9,9,0,0,0,9,9,9,9,2,9,9,9,9,9,9,9,1,0,0,0,0,0,9,9,9,9,9,1,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,9,9,9,9,0,0,1,9,9,9,1,0,9,9,9,9,9,0,0,0,9,9,9,9,9,9,9,1,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,9,9,9,0,0,9,9,9,9,9,9,0,9,9,9,9,0,0,0,1,0,9,9,9,9,9,9,9,1,1,1,1,1,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,9,9,0,0,9,9,9,9,9,9,9,0,9,9,9,0,0,0,0,0,1,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,9,9,9,0,9,9,9,9,1,9,9,9,9,9,0,0,0,0,0,0,0,1,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
+              0,1,9,9,9,9,9,9,1,1,9,9,9,9,1,0,0,0,0,0,0,0,0,1,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,
               0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
               
-mapa_1: .word 80,
+mapa_2: .word 80,
         .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	      0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,9,9,9,9,0,0,
@@ -1620,7 +1845,7 @@ mapa_1: .word 80,
 #-------------------------------------------------SPRITES SAMUS-----------------------------------------------------------------
 
 samus_parada:   .word 16, 32
-		.byte 7,199,199,199,199,91,91,91,199,199,199,199,199,199,199,7,
+		.byte 199,199,199,199,199,91,91,91,199,199,199,199,199,199,199,199,
 		199,199,199,91,91,91,91,91,91,91,199,199,199,199,199,199,
 		199,199,91,114,91,0,47,0,91,91,91,199,199,199,199,199,
 		199,91,114,91,91,47,0,47,91,114,47,199,199,199,199,199,
@@ -1651,7 +1876,7 @@ samus_parada:   .word 16, 32
 		91,91,199,199,199,91,91,91,114,91,199,199,199,199,199,199,
 		114,114,199,199,199,91,91,114,91,91,91,199,199,199,199,199,
 		91,91,91,199,199,199,91,114,91,91,91,91,199,199,199,199,
-		7,91,91,91,199,199,199,199,199,199,199,199,199,199,199,7
+		91,91,91,91,199,199,199,199,199,199,199,199,199,199,199,199
 
 samus_andando_1:.word 16, 32
 		.byte 199,199,199,199,199,199,199,199,199,199,199,199,199,199,199,199,
@@ -1721,7 +1946,7 @@ samus_andando_2:.word 16, 32
 		91,91,91,91,199,199,199,199,199,199,199,199,199,199,199,199,
 		199,91,91,91,91,199,199,199,199,199,199,199,199,199,199,199
 		
-samus_andando_3:.word 16, 32  # NA VERDADE √â O FRAME 1 REPETIDO
+samus_andando_3:.word 16, 32  # NA VERDADE … O FRAME 1 REPETIDO
 		.byte 199,199,199,199,199,199,199,199,199,199,199,199,199,199,199,199,
 		199,199,199,199,199,199,199,199,199,91,91,91,199,199,199,199,
 		199,199,199,199,199,199,199,91,91,91,91,91,91,91,199,199,
@@ -1841,25 +2066,84 @@ Samus_agachada: .word 16, 16
 		91,114,91,24,24,24,24,0,0,91,91,114,0,0,0,0,
 		114,91,91,47,47,24,0,0,0,91,114,91,91,0,0,0
 		.space 256
+		
+		#-----------------------------------------------------------------------------------------------
 
-samus_bola:     .word 16, 16
-		.byte 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
-	              255,255,255,255,255,255, 24, 24, 91,255,255,255,255,255,255,255,
-		      255,255,255,255,24,24,24,24,91,91,91,255,255,255,255,255,
-		      255,255,255,24,47,47,47,24,91,91,91,91,255,255,255,255,
-		      255,255,24,47,47,47,24,24,91,91,91,91,91,255,255,255,
-		      255,24,24,47,47,24,24,24,91,91,91,47,91,91,255,255,
-		      255,24,24,47,24,24,24,24,91,91,47,91,91,91,255,255,
-		      24,24,24,24,24,24,24,24,24,91,91,91,91,91,91,255,
-		      24,24,24,24,47,47,24,24,24,24,91,91,91,91,91,255,
-		      24,24,24,24,24,24,47,24,24,24,24,91,91,91,91,255,
-		      255,24,24,24,24,24,24,47,24,24,24,24,24,91,255,255,
-		      255,24,24,24,24,24,24,24,47,47,24,24,24,24,255,255,
-		      255,255,91,91,114,24,24,24,47,47,47,24,24,255,255,255,
-		      255,255,255,91,91,114,24,24,24,47,47,24,255,255,255,255,
-		      255,255,255,255,91,91,91,24,24,24,24,255,255,255,255,255,
-		      255,255,255,255,255,255,91,24,24,255,255,255,255,255,255,255,
+samus_bola_1: .word 16, 16
+.byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,24,24,24,24,0,0,0,0,0,0,0,
+0,0,0,24,24,24,91,91,91,91,91,0,0,0,0,0,
+0,0,24,24,24,24,91,91,91,91,91,91,0,0,0,0,
+0,24,24,24,24,24,24,91,91,91,91,91,91,0,0,0,
+24,24,24,24,47,47,24,24,91,91,114,91,91,91,0,0,
+24,24,24,24,47,24,24,24,24,91,114,114,91,91,0,0,
+24,24,24,24,24,24,24,24,24,24,91,114,91,91,0,0,
+24,24,24,24,24,47,47,24,24,24,24,91,91,91,0,0,
+24,24,24,24,24,24,47,47,24,24,24,24,24,24,0,0,
+24,24,24,24,24,24,24,24,24,24,47,24,24,24,0,0,
+0,24,24,24,24,91,24,24,24,24,24,24,24,0,0,0,
+0,0,24,24,91,114,91,24,24,24,24,24,0,0,0,0,
+0,0,0,24,91,91,114,91,91,91,24,0,0,0,0,0,
+0,0,0,0,0,91,91,91,91,0,0,0,0,0,0,0
+.space 256
 
+samus_bola_2: .word 16, 16
+.byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,24,24,24,24,24,24,0,0,0,0,0,0,
+0,0,0,24,24,24,24,24,24,24,24,0,0,0,0,0,
+0,0,24,24,24,24,24,24,24,24,24,24,0,0,0,0,
+0,24,24,24,24,24,24,24,24,24,24,24,24,0,0,0,
+0,91,91,24,24,24,24,24,47,47,24,24,24,0,0,0,
+91,91,114,91,24,24,47,24,24,47,24,24,24,24,0,0,
+91,114,91,24,24,47,47,24,24,24,24,91,91,24,0,0,
+91,91,24,24,24,47,24,24,24,24,91,91,91,24,0,0,
+91,91,24,24,24,24,24,24,24,91,91,91,91,24,0,0,
+0,91,24,24,24,24,24,24,91,91,91,91,91,0,0,0,
+0,24,24,24,47,24,24,91,114,114,91,91,91,0,0,0,
+0,0,24,24,24,24,91,114,114,91,91,91,0,0,0,0,
+0,0,0,24,24,24,91,91,91,91,91,0,0,0,0,0,
+0,0,0,0,24,24,91,91,91,91,0,0,0,0,0,0
+.space 256
+
+samus_bola_3: .word 16, 16
+.byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,91,91,91,91,0,0,0,0,0,0,0,
+0,0,0,24,91,91,91,114,91,91,24,0,0,0,0,0,
+0,0,24,24,24,24,24,91,114,91,24,24,0,0,0,0,
+0,24,24,24,24,24,24,24,91,24,24,24,24,0,0,0,
+24,24,24,47,24,24,24,24,24,24,24,24,24,24,0,0,
+24,24,24,24,24,24,47,47,24,24,24,24,24,24,0,0,
+91,91,91,24,24,24,24,47,47,24,24,24,24,24,0,0,
+91,91,114,91,24,24,24,24,24,24,24,24,24,24,0,0,
+91,91,114,114,91,24,24,24,24,47,24,24,24,24,0,0,
+91,91,91,114,91,91,24,24,47,47,24,24,24,24,0,0,
+0,91,91,91,91,91,91,24,24,24,24,24,24,0,0,0,
+0,0,91,91,91,91,91,91,24,24,24,24,0,0,0,0,
+0,0,0,91,91,91,91,91,24,24,24,0,0,0,0,0,
+0,0,0,0,0,24,24,24,24,0,0,0,0,0,0,0
+.space 256
+
+samus_bola_4: .word 16, 16
+.byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,91,91,91,91,24,24,0,0,0,0,0,0,
+0,0,0,91,91,91,91,91,24,24,24,0,0,0,0,0,
+0,0,91,91,91,114,114,91,24,24,24,24,0,0,0,0,
+0,91,91,91,114,114,91,24,24,47,24,24,24,0,0,0,
+0,91,91,91,91,91,24,24,24,24,24,24,91,0,0,0,
+24,91,91,91,91,24,24,24,24,24,24,24,91,91,0,0,
+24,91,91,91,24,24,24,24,47,24,24,24,91,91,0,0,
+24,91,91,24,24,24,24,47,47,24,24,91,114,91,0,0,
+24,24,24,24,47,24,24,47,24,24,91,114,91,91,0,0,
+0,24,24,24,47,47,24,24,24,24,24,91,91,0,0,0,
+0,24,24,24,24,24,24,24,24,24,24,24,24,0,0,0,
+0,0,24,24,24,24,24,24,24,24,24,24,0,0,0,0,
+0,0,0,24,24,24,24,24,24,24,24,0,0,0,0,0,
+0,0,0,0,24,24,24,24,24,24,0,0,0,0,0,0
+.space 256
 
 #---------------------------------------------------------------------------------------------------------------------------------
 
